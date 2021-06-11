@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Catalogue</string>
+    <string name="loginFragment_signUp_tv">Not a member yet?\nSign up</string>
 </resources>

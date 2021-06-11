@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class RestUtil {
 
     companion object {
-        private const val BASE_URL = "http://192.168.0.112:8080/api/"
+        private const val BASE_URL = "http://192.168.176.14:8080/api/"
 
         private val builder: Retrofit.Builder = Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -24,12 +24,12 @@ class RestUtil {
         }
 
         fun <S> createService(serviceClass: Class<S>, token: String?): S {
-            if (token != null) {
+            if (token != null && token.isNotEmpty()) {
                 httpClient.interceptors().clear()
                 httpClient.addInterceptor { chain ->
                     val original: Request = chain.request()
                     val request: Request = original.newBuilder()
-                        .header("Authorization", token)
+                        .header("Authorization", String.format("Bearer %s", token))
                         .build()
                     chain.proceed(request)
                 }
