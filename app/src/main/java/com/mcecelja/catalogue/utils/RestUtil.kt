@@ -1,5 +1,6 @@
 package com.mcecelja.catalogue.utils
 
+import com.mcecelja.catalogue.enums.EnvironmentEnum
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
@@ -9,10 +10,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class RestUtil {
 
     companion object {
-        private const val BASE_URL = "http://192.168.176.14:8080/api/"
-
         private val builder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(EnvironmentEnum.LOCAL_NETWORK.url)
             .addConverterFactory(GsonConverterFactory.create())
 
         private var retrofit = builder.build()

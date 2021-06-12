@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Catalogue</string>
-    <string name="loginFragment_signUp_tv">Not a member yet?\nSign up</string>
+    <string name="loginFragment_signUp_tv">Nemate korisnički račun?\nRegistriraj se</string>
+    <string name="et_username_hint">Korisničko ime</string>
+    <string name="et_password_hint">Lozinka</string>
+    <string name="mb_login_text">Prijavi se</string>
+    <string name="iv_logo_description">App logo</string>
 </resources>
