@@ -30,7 +30,7 @@ class RegisterFragment : Fragment() {
 
         binding = FragmentRegisterBinding.inflate(inflater, container, false)
 
-        binding.bRegister.setOnClickListener { registerUser() }
+        binding.mbRegister.setOnClickListener { registerUser() }
 
         return binding.root
     }
@@ -41,8 +41,8 @@ class RegisterFragment : Fragment() {
             binding.etSurname.text.toString(),
             binding.etUsername.text.toString(),
             binding.etPassword.text.toString(),
+            binding.etPasswordConfirm.text.toString(),
             binding.etEmail.text.toString(),
-            binding.etEmailConfirm.text.toString()
         )
 
         val apiCall =

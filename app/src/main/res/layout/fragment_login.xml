@@ -57,7 +57,7 @@
             android:layout_height="match_parent"
             android:hint="@string/et_username_hint"
             android:inputType="text"
-            android:drawableLeft="@drawable/person"
+            android:drawableStart="@drawable/person"
             android:drawablePadding="@dimen/padding_small"/>
     </com.google.android.material.textfield.TextInputLayout>
 
