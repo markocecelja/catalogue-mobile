@@ -13,7 +13,6 @@ import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.services.UserService
-import com.mcecelja.catalogue.ui.MainActivity
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.utils.RestUtil
 import retrofit2.Call

@@ -17,9 +17,11 @@ import com.mcecelja.catalogue.data.dto.users.UserLoginRequestDTO
 import com.mcecelja.catalogue.data.dto.users.UserLoginResponseDTO
 import com.mcecelja.catalogue.databinding.FragmentLoginBinding
 import com.mcecelja.catalogue.services.AuthenticationService
+import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.MainActivity
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -29,12 +31,14 @@ class LoginFragment : Fragment() {
 
     private lateinit var loginBinding: FragmentLoginBinding
 
+    private val loadingViewModel by viewModel<LoadingViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 activity?.finishAffinity()
             }
@@ -45,13 +49,15 @@ class LoginFragment : Fragment() {
         loginBinding.mbLogin.setOnClickListener { loginUser() }
         loginBinding.tvSignUp.setOnClickListener { openRegisterFragment() }
 
+        loadingViewModel.loadingVisibility.observe(viewLifecycleOwner, { setupLoadingScreen(it) })
+
         return loginBinding.root
     }
 
     private fun openRegisterFragment() {
-        fragmentManager!!.beginTransaction()
+        requireActivity().supportFragmentManager.beginTransaction()
             .replace(
-                R.id.fl_fragmentContainer,
+                R.id.viewPager,
                 RegisterFragment.create(),
                 RegisterFragment.TAG
             )
@@ -79,10 +85,7 @@ class LoginFragment : Fragment() {
         val apiCall =
             RestUtil.createService(AuthenticationService::class.java).loginUser(userLoginRequestDTO)
 
-        activity?.window?.setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        loginBinding.rlLogin.visibility = View.VISIBLE
+        loadingViewModel.changeVisibility(View.VISIBLE)
 
         apiCall.enqueue(object : Callback<ResponseMessage<UserLoginResponseDTO>> {
             override fun onResponse(
@@ -90,9 +93,7 @@ class LoginFragment : Fragment() {
                 response: Response<ResponseMessage<UserLoginResponseDTO>>
             ) {
 
-                loginBinding.rlLogin.visibility = View.GONE
-                activity?.window?.clearFlags(
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                loadingViewModel.changeVisibility(View.GONE)
 
                 if (response.isSuccessful) {
 
@@ -113,9 +114,7 @@ class LoginFragment : Fragment() {
                 call: Call<ResponseMessage<UserLoginResponseDTO>>,
                 t: Throwable
             ) {
-                loginBinding.rlLogin.visibility = View.GONE
-                activity?.window?.clearFlags(
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                loadingViewModel.changeVisibility(View.GONE)
 
                 Toast.makeText(
                     Catalogue.application,
@@ -125,6 +124,19 @@ class LoginFragment : Fragment() {
                     .show()
             }
         })
+    }
+
+    private fun setupLoadingScreen(visibility: Int) {
+        loginBinding.rlLogin.visibility = visibility
+
+        if(visibility == View.VISIBLE) {
+            activity?.window?.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        } else {
+            activity?.window?.clearFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        }
     }
 
     companion object {

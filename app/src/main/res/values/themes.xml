@@ -13,4 +13,9 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/primary_app_color</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="MineCustomTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

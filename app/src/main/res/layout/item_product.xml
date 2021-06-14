@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginBottom="@dimen/margin_small">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guid_begin_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="8dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guid_end_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="8dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guid_begin_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="8dp" />
+
+    <TextView
+        android:id="@+id/tv_productName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/guid_begin_horizontal"
+        app:layout_constraintStart_toStartOf="@id/guid_begin_vertical"
+        app:layout_constraintEnd_toEndOf="@id/guid_end_vertical"
+        tools:text="@tools:sample/lorem"
+        android:maxLines="1"
+        android:textSize="20sp"
+        android:padding="@dimen/padding_medium"
+        android:background="@drawable/border"
+        android:gravity="center"
+        android:textColor="@color/white"/>
+
+    <ImageView
+        android:id="@+id/iv_favourite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/favourite"
+        app:layout_constraintEnd_toEndOf="@id/guid_end_vertical"
+        app:layout_constraintTop_toTopOf="@id/guid_begin_horizontal"
+        android:contentDescription="@string/iv_favourite_description"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_small"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

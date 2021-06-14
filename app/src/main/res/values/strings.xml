@@ -12,4 +12,5 @@
     <string name="register_et_email_hint">E-mail</string>
     <string name="register_et_password_confirm_hint">Ponovno unesite lozinku</string>
     <string name="register_b_register_text">Registriraj se</string>
+    <string name="iv_favourite_description">Add to favourite</string>
 </resources>

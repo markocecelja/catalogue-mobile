@@ -62,7 +62,7 @@ class RegisterFragment : Fragment() {
                             activity
                         )
                     } else {
-                        fragmentManager!!.beginTransaction()
+                        requireActivity().supportFragmentManager.beginTransaction()
                             .replace(
                                 R.id.fl_fragmentContainer,
                                 LoginFragment.create(),
