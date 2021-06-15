@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:background="#B0000000"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="invisible">
 
         <ProgressBar
             android:id="@+id/pb_login"

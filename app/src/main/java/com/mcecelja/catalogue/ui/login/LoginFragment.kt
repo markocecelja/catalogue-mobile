@@ -91,7 +91,7 @@ class LoginFragment : Fragment() {
                 response: Response<ResponseMessage<UserLoginResponseDTO>>
             ) {
 
-                loadingViewModel.changeVisibility(View.GONE)
+                loadingViewModel.changeVisibility(View.INVISIBLE)
 
                 if (response.isSuccessful) {
 
@@ -112,7 +112,7 @@ class LoginFragment : Fragment() {
                 call: Call<ResponseMessage<UserLoginResponseDTO>>,
                 t: Throwable
             ) {
-                loadingViewModel.changeVisibility(View.GONE)
+                loadingViewModel.changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,

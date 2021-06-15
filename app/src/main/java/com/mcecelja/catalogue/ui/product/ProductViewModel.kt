@@ -41,7 +41,7 @@ class ProductViewModel : ViewModel() {
                 call: Call<ResponseMessage<ProductDTO>>,
                 response: Response<ResponseMessage<ProductDTO>>
             ) {
-                loadingViewModel.changeVisibility(View.GONE)
+                loadingViewModel.changeVisibility(View.INVISIBLE)
 
                 if (response.isSuccessful) {
 
@@ -62,7 +62,7 @@ class ProductViewModel : ViewModel() {
                 t: Throwable
             ) {
 
-                loadingViewModel.changeVisibility(View.GONE)
+                loadingViewModel.changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,

@@ -12,7 +12,7 @@ class OrganizationViewHolder(itemView: View) :
     fun bind(organization: OrganizationWithPriceDTO, position: Int) {
         val itemBinding = ItemOrganizationBinding.bind(itemView)
         itemBinding.tvStore.text = organization.name
-        itemBinding.tvPrice.text = String.format("%s HRK", organization.price)
+        itemBinding.tvPrice.text = String.format("%.2f HRK", organization.price)
 
         itemBinding.ivStar.setImageResource(getStarForOrganizationPosition(position))
     }

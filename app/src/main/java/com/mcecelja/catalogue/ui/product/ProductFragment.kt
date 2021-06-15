@@ -49,8 +49,8 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         arguments?.let {
             val token = it.getSerializable(TOKEN) as String
             fetchProducts(token, null)
-
         }
+
         productViewModel.products.observe(
             viewLifecycleOwner,
             { (productFragmentBinding.rvProducts.adapter as ProductAdapter).refreshData(it) })
@@ -92,7 +92,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
                 response: Response<ResponseMessage<List<ProductDTO>>>
             ) {
 
-                loadingViewModel.changeVisibility(View.GONE)
+                loadingViewModel.changeVisibility(View.INVISIBLE)
 
                 if (response.isSuccessful) {
 
@@ -112,7 +112,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
                 t: Throwable
             ) {
 
-                loadingViewModel.changeVisibility(View.GONE)
+                loadingViewModel.changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,

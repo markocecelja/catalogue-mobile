@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 
 class LoadingViewModel : ViewModel() {
 
-    private val _loadingVisibility: MutableLiveData<Int> = MutableLiveData<Int>(View.GONE)
+    private val _loadingVisibility: MutableLiveData<Int> = MutableLiveData<Int>(View.INVISIBLE)
     val loadingVisibility: LiveData<Int> = _loadingVisibility
 
     fun changeVisibility(visibility: Int) {
