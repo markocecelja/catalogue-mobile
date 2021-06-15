@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.adapters.product.ProductAdapter
+import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.databinding.FragmentProductsBinding
@@ -22,6 +25,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 class ProductFragment : Fragment(), ProductItemClickListener {
 
@@ -42,7 +46,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
         arguments?.let {
             val token = it.getSerializable(TOKEN) as String
-            fetchProducts(token)
+            fetchProducts(token, null)
 
         }
         productViewModel.products.observe(
@@ -52,6 +56,14 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         loadingViewModel.loadingVisibility.observe(
             viewLifecycleOwner,
             { (activity as MainActivity).setupLoadingScreen(it) })
+
+        productFragmentBinding.etSearch.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                fetchProducts(PreferenceManager.getPreference("Token"), productFragmentBinding.etSearch.text.toString())
+                return@OnEditorActionListener true
+            }
+            false
+        })
 
         return productFragmentBinding.root
     }
@@ -65,10 +77,10 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         productFragmentBinding.rvProducts.adapter = ProductAdapter(mutableListOf(), this)
     }
 
-    private fun fetchProducts(token: String) {
+    private fun fetchProducts(token: String, name: String?) {
 
         val apiCall =
-            RestUtil.createService(ProductService::class.java, token).getProducts()
+            RestUtil.createService(ProductService::class.java, token).getProducts(name)
 
         loadingViewModel.changeVisibility(View.VISIBLE)
 

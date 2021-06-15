@@ -6,11 +6,12 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ProductService {
 
     @GET("products")
-    fun getProducts(): Call<ResponseMessage<List<ProductDTO>>>
+    fun getProducts(@Query("name") name: String?): Call<ResponseMessage<List<ProductDTO>>>
 
     @POST("products/{id}/favourite")
     fun changeFavouriteStatus(@Path("id") id: Long): Call<ResponseMessage<ProductDTO>>
