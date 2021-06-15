@@ -14,4 +14,7 @@
     <string name="register_b_register_text">Registriraj se</string>
     <string name="iv_favourite_description">Add to favourite</string>
     <string name="et_search_hint">Pretražite proizvode</string>
+    <string name="iv_store_contentDescription">Store</string>
+    <string name="iv_price_contentDescription">Price</string>
+    <string name="iv_star_contentDescription">Star</string>
 </resources>

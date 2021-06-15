@@ -17,7 +17,7 @@ import com.mcecelja.catalogue.data.dto.users.UserLoginResponseDTO
 import com.mcecelja.catalogue.databinding.FragmentLoginBinding
 import com.mcecelja.catalogue.services.AuthenticationService
 import com.mcecelja.catalogue.ui.LoadingViewModel
-import com.mcecelja.catalogue.ui.MainActivity
+import com.mcecelja.catalogue.ui.catalogue.MainActivity
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel

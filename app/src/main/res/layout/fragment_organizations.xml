@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginBottom="@dimen/margin_small">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guid_begin_vertical"
@@ -53,5 +52,11 @@
         android:layout_marginTop="@dimen/margin_small"
         android:layout_marginEnd="@dimen/margin_small"/>
 
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_organizations"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        tools:listitem="@layout/item_organization"
+        app:layout_constraintTop_toBottomOf="@id/tv_productName"
+        android:layout_marginTop="@dimen/margin_medium"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

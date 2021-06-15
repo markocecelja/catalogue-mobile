@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcecelja.catalogue.Catalogue
+import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.adapters.product.ProductAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
@@ -18,7 +19,8 @@ import com.mcecelja.catalogue.databinding.FragmentProductsBinding
 import com.mcecelja.catalogue.listener.ProductItemClickListener
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.ui.LoadingViewModel
-import com.mcecelja.catalogue.ui.MainActivity
+import com.mcecelja.catalogue.ui.catalogue.MainActivity
+import com.mcecelja.catalogue.ui.organization.OrganizationFragment
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -124,6 +126,17 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
     override fun onFavouriteClicked(position: Int) {
         productViewModel.changeFavouriteStatusForPosition(position, activity, loadingViewModel)
+    }
+
+    override fun onProductClicked(position: Int) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.fl_fragmentContainer,
+                OrganizationFragment.create(productViewModel.products.value!![position]),
+                OrganizationFragment.TAG
+            )
+            .addToBackStack(TAG)
+            .commit()
     }
 
     companion object {

@@ -21,5 +21,6 @@ class ProductViewHolder(itemView: View) :
         }
 
         itemBinding.ivFavourite.setOnClickListener { productItemClickListener.onFavouriteClicked(position) }
+        itemBinding.tvProductName.setOnClickListener { productItemClickListener.onProductClicked(position) }
     }
 }
