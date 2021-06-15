@@ -21,5 +21,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:tabTextAppearance="@style/MineCustomTabText"/>
 
+    <RelativeLayout
+        android:id="@+id/rl_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B0000000"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/pb_main"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

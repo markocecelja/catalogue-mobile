@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
@@ -25,7 +24,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 
 class LoginFragment : Fragment() {
 
@@ -49,7 +47,7 @@ class LoginFragment : Fragment() {
         loginBinding.mbLogin.setOnClickListener { loginUser() }
         loginBinding.tvSignUp.setOnClickListener { openRegisterFragment() }
 
-        loadingViewModel.loadingVisibility.observe(viewLifecycleOwner, { setupLoadingScreen(it) })
+        loadingViewModel.loadingVisibility.observe(viewLifecycleOwner, { (activity as LoginActivity).setupLoadingScreen(it) })
 
         return loginBinding.root
     }
@@ -57,7 +55,7 @@ class LoginFragment : Fragment() {
     private fun openRegisterFragment() {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
-                R.id.viewPager,
+                R.id.fl_fragmentContainer,
                 RegisterFragment.create(),
                 RegisterFragment.TAG
             )
@@ -124,19 +122,6 @@ class LoginFragment : Fragment() {
                     .show()
             }
         })
-    }
-
-    private fun setupLoadingScreen(visibility: Int) {
-        loginBinding.rlLogin.visibility = visibility
-
-        if(visibility == View.VISIBLE) {
-            activity?.window?.setFlags(
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        } else {
-            activity?.window?.clearFlags(
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        }
     }
 
     companion object {

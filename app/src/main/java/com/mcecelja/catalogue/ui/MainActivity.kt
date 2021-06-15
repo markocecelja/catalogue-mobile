@@ -3,6 +3,8 @@ package com.mcecelja.catalogue.ui
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.mcecelja.catalogue.adapters.PageAdapter
@@ -22,14 +24,17 @@ class MainActivity : AppCompatActivity() {
 
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
 
+        val pageAdapter = PageAdapter(this)
+        pageAdapter.addFragment(TabFragmentEnum.PRODUCT)
+        pageAdapter.addFragment(TabFragmentEnum.PROFILE)
+
         viewPager = mainBinding.viewPager
-        viewPager.adapter = PageAdapter(this)
+        viewPager.adapter = pageAdapter
 
         val tabLayout = mainBinding.tabLayout
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             TabFragmentEnum.getByPosition(position)?.let {
                 tab.text = it.title
-
                 tab.setIcon(it.icon)
             }
         }.attach()
@@ -44,5 +49,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun setupLoadingScreen(visibility: Int) {
+        mainBinding.rlMain.visibility = visibility
+
+        if(visibility == View.VISIBLE) {
+            this.window?.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        } else {
+            this.window?.clearFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        }
+    }
 
 }
