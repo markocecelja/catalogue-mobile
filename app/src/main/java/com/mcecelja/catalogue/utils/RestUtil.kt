@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 class RestUtil {
@@ -14,7 +15,13 @@ class RestUtil {
             .baseUrl(EnvironmentEnum.LOCAL_NETWORK.url)
             .addConverterFactory(GsonConverterFactory.create())
 
-        private var retrofit = builder.build()
+        private val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+
+        private var retrofit = builder.client(okHttpClient).build()
 
         private val httpClient = OkHttpClient.Builder()
 
