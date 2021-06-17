@@ -15,6 +15,7 @@ import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.users.UserLoginRequestDTO
 import com.mcecelja.catalogue.data.dto.users.UserLoginResponseDTO
 import com.mcecelja.catalogue.databinding.FragmentLoginBinding
+import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.services.AuthenticationService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.MainActivity
@@ -36,9 +37,9 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                activity?.finishAffinity()
+                requireActivity().finishAffinity()
             }
         })
 
@@ -101,7 +102,7 @@ class LoginFragment : Fragment() {
                             activity
                         )
                     } else {
-                        PreferenceManager.savePreference("Token", response.body()?.payload?.jwt)
+                        PreferenceManager.savePreference(PreferenceEnum.TOKEN, response.body()?.payload?.jwt)
                         val mainIntent = Intent(Catalogue.application, MainActivity::class.java)
                         startActivity(mainIntent)
                     }

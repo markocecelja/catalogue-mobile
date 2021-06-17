@@ -12,6 +12,7 @@ import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
+import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.services.UserService
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.utils.RestUtil
@@ -30,33 +31,31 @@ class UserProfileFragment : Fragment() {
     ): View {
         userProfileBinding = FragmentUserProfileBinding.inflate(inflater, container, false)
 
-        arguments?.let {
-            val token = it.getSerializable(TOKEN) as String
+        val apiCall =
+            RestUtil.createService(
+                UserService::class.java,
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
+            ).getCurrentUserInfo()
 
-            val apiCall =
-                RestUtil.createService(UserService::class.java, token).getCurrentUserInfo()
-
-            apiCall.enqueue(object : Callback<ResponseMessage<UserDTO>> {
-                override fun onResponse(
-                    call: Call<ResponseMessage<UserDTO>>,
-                    response: Response<ResponseMessage<UserDTO>>
-                ) {
-                    if (response.isSuccessful) {
-                        userProfileBinding.tvUsername.text = response.body()?.payload?.name
-                    }
+        apiCall.enqueue(object : Callback<ResponseMessage<UserDTO>> {
+            override fun onResponse(
+                call: Call<ResponseMessage<UserDTO>>,
+                response: Response<ResponseMessage<UserDTO>>
+            ) {
+                if (response.isSuccessful) {
+                    userProfileBinding.tvUsername.text = response.body()?.payload?.name
                 }
+            }
 
-                override fun onFailure(call: Call<ResponseMessage<UserDTO>>, t: Throwable) {
-                    Toast.makeText(
-                        Catalogue.application,
-                        "Get current user info failed!",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-            })
-
-        }
+            override fun onFailure(call: Call<ResponseMessage<UserDTO>>, t: Throwable) {
+                Toast.makeText(
+                    Catalogue.application,
+                    "Get current user info failed!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+        })
 
         userProfileBinding.bLogout.setOnClickListener { logout() }
 
@@ -65,18 +64,13 @@ class UserProfileFragment : Fragment() {
 
     companion object {
         const val TAG = "User profile"
-        private const val TOKEN = "Token"
-        fun create(token: String): UserProfileFragment {
-            val args = Bundle()
-            args.putSerializable(TOKEN, token)
-            val fragment = UserProfileFragment()
-            fragment.arguments = args
-            return fragment
+        fun create(): UserProfileFragment {
+            return UserProfileFragment()
         }
     }
 
     private fun logout() {
-        PreferenceManager.removePreference("Token")
+        PreferenceManager.removePreference(PreferenceEnum.TOKEN)
         val loginIntent = Intent(Catalogue.application, LoginActivity::class.java)
         startActivity(loginIntent)
     }

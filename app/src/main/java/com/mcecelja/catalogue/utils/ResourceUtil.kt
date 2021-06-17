@@ -10,3 +10,10 @@ fun getStarForOrganizationPosition(position: Int): Int {
         else -> 0
     }
 }
+
+fun getFavouriteResourceForStatus(status: Boolean): Int {
+    return when (status) {
+        true -> R.drawable.favourite_added
+        else -> R.drawable.favourite
+    }
+}

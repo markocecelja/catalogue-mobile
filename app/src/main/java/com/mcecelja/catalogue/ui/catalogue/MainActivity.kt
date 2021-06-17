@@ -5,15 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayoutMediator
 import com.mcecelja.catalogue.R
-import com.mcecelja.catalogue.adapters.PageAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.databinding.ActivityMainBinding
-import com.mcecelja.catalogue.enums.TabFragmentEnum
+import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.ui.login.LoginActivity
-import com.mcecelja.catalogue.ui.login.LoginFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(mainBinding.root)
 
-        val token = PreferenceManager.getPreference("Token")
+        val token = PreferenceManager.getPreference(PreferenceEnum.TOKEN)
 
         if (token.isEmpty()) {
             val loginIntent = Intent(this, LoginActivity::class.java)

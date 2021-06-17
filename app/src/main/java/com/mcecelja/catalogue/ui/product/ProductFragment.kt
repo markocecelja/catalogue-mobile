@@ -16,6 +16,7 @@ import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.databinding.FragmentProductsBinding
+import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.ProductItemClickListener
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.ui.LoadingViewModel
@@ -42,14 +43,18 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        requireActivity().supportFragmentManager.addOnBackStackChangedListener {
+            fetchProducts(
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN),
+                productFragmentBinding.etSearch.text.toString()
+            )
+        }
+
         productFragmentBinding = FragmentProductsBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
 
-        arguments?.let {
-            val token = it.getSerializable(TOKEN) as String
-            fetchProducts(token, null)
-        }
+        fetchProducts(PreferenceManager.getPreference(PreferenceEnum.TOKEN), null)
 
         productViewModel.products.observe(
             viewLifecycleOwner,
@@ -61,7 +66,10 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
         productFragmentBinding.etSearch.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                fetchProducts(PreferenceManager.getPreference("Token"), productFragmentBinding.etSearch.text.toString())
+                fetchProducts(
+                    PreferenceManager.getPreference(PreferenceEnum.TOKEN),
+                    productFragmentBinding.etSearch.text.toString()
+                )
                 return@OnEditorActionListener true
             }
             false
@@ -141,13 +149,8 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
     companion object {
         const val TAG = "Products list"
-        private const val TOKEN = "Token"
-        fun create(token: String): ProductFragment {
-            val args = Bundle()
-            args.putSerializable(TOKEN, token)
-            val fragment = ProductFragment()
-            fragment.arguments = args
-            return fragment
+        fun create(): ProductFragment {
+            return ProductFragment()
         }
     }
 }

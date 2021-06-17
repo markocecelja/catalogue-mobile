@@ -15,13 +15,13 @@ enum class TabFragmentEnum(
 
     PRODUCT(
         0,
-        ProductFragment.create(PreferenceManager.getPreference("Token")),
+        ProductFragment.create(),
         "Proizvodi",
         R.drawable.products
     ),
     PROFILE(
         1,
-        UserProfileFragment.create(PreferenceManager.getPreference("Token")),
+        UserProfileFragment.create(),
         "Profil",
         R.drawable.person
     );

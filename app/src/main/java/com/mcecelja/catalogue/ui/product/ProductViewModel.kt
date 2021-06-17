@@ -10,6 +10,7 @@ import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
+import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.utils.AlertUtil
@@ -32,7 +33,7 @@ class ProductViewModel : ViewModel() {
         _products.value?.let{products.addAll(it)}
 
         val apiCall =
-            RestUtil.createService(ProductService::class.java, PreferenceManager.getPreference("Token")).changeFavouriteStatus(products[position].id)
+            RestUtil.createService(ProductService::class.java, PreferenceManager.getPreference(PreferenceEnum.TOKEN)).changeFavouriteStatus(products[position].id)
 
         loadingViewModel.changeVisibility(View.VISIBLE)
 

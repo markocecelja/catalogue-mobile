@@ -2,34 +2,35 @@ package com.mcecelja.catalogue.data
 
 import android.content.Context
 import com.mcecelja.catalogue.Catalogue
+import com.mcecelja.catalogue.enums.PreferenceEnum
 
 class PreferenceManager {
 
     companion object {
         private const val PREFS_FILE = "preferences"
 
-        fun getPreference(key: String): String {
+        fun getPreference(preference: PreferenceEnum): String {
             return Catalogue.application.getSharedPreferences(
                 PREFS_FILE, Context.MODE_PRIVATE
             )
-                .getString(key, "") ?: ""
+                .getString(preference.key, "") ?: ""
         }
 
-        fun savePreference(key: String, value: String?) {
+        fun savePreference(preference: PreferenceEnum, value: String?) {
             Catalogue.application.getSharedPreferences(
                 PREFS_FILE, Context.MODE_PRIVATE
             )
                 .edit()
-                .putString(key, value)
+                .putString(preference.key, value)
                 .apply()
         }
 
-        fun removePreference(key: String) {
+        fun removePreference(preference: PreferenceEnum) {
             Catalogue.application.getSharedPreferences(
                 PREFS_FILE, Context.MODE_PRIVATE
             )
                 .edit()
-                .remove(key)
+                .remove(preference.key)
                 .apply()
         }
     }
