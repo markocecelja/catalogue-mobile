@@ -1,3 +1,3 @@
 package com.mcecelja.catalogue.data.dto.users
 
-data class UserDTO(val id: String, val name: String)
+data class UserDTO(val id: String, val firstName: String, val lastName: String)

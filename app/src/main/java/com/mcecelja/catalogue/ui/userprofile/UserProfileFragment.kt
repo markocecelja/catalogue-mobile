@@ -5,24 +5,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.mcecelja.catalogue.Catalogue
+import com.mcecelja.catalogue.R
+import com.mcecelja.catalogue.adapters.favourites.FavouritesAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
-import com.mcecelja.catalogue.data.dto.ResponseMessage
-import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
-import com.mcecelja.catalogue.services.UserService
+import com.mcecelja.catalogue.listener.FavouriteItemClickListener
 import com.mcecelja.catalogue.ui.login.LoginActivity
-import com.mcecelja.catalogue.utils.RestUtil
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class UserProfileFragment : Fragment() {
+class UserProfileFragment : Fragment(), FavouriteItemClickListener {
 
     private lateinit var userProfileBinding: FragmentUserProfileBinding
+
+    private val userProfileViewModel by viewModel<UserProfileViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,35 +30,46 @@ class UserProfileFragment : Fragment() {
     ): View {
         userProfileBinding = FragmentUserProfileBinding.inflate(inflater, container, false)
 
-        val apiCall =
-            RestUtil.createService(
-                UserService::class.java,
-                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
-            ).getCurrentUserInfo()
+        userProfileBinding.rvFavourites.adapter = FavouritesAdapter(mutableListOf(), this)
+        userProfileBinding.mbLogout.setOnClickListener { logout() }
 
-        apiCall.enqueue(object : Callback<ResponseMessage<UserDTO>> {
-            override fun onResponse(
-                call: Call<ResponseMessage<UserDTO>>,
-                response: Response<ResponseMessage<UserDTO>>
-            ) {
-                if (response.isSuccessful) {
-                    userProfileBinding.tvUsername.text = response.body()?.payload?.name
-                }
-            }
+        userProfileViewModel.setUser()
 
-            override fun onFailure(call: Call<ResponseMessage<UserDTO>>, t: Throwable) {
-                Toast.makeText(
-                    Catalogue.application,
-                    "Get current user info failed!",
-                    Toast.LENGTH_SHORT
+        userProfileViewModel.user.observe(
+            viewLifecycleOwner,
+            {
+                userProfileBinding.tvUserInfo.text = String.format(
+                    "%s %s",
+                    userProfileViewModel.user.value!!.firstName,
+                    userProfileViewModel.user.value!!.lastName
                 )
-                    .show()
-            }
-        })
+            })
 
-        userProfileBinding.bLogout.setOnClickListener { logout() }
+        userProfileViewModel.favourites.observe(
+            viewLifecycleOwner,
+            {
+                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(
+                    userProfileViewModel.favourites.value!!
+                )
+            })
 
         return userProfileBinding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        userProfileViewModel.setFavourites(requireActivity())
+    }
+
+    override fun onItemClicked(position: Int) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.fl_fragmentContainer,
+                OrganizationsListFragment.create(userProfileViewModel.favourites.value!![position]),
+                OrganizationsListFragment.TAG
+            )
+            .addToBackStack(TAG)
+            .commit()
     }
 
     companion object {

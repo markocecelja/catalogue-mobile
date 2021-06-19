@@ -15,4 +15,7 @@ interface ProductService {
 
     @POST("products/{id}/favourite")
     fun changeFavouriteStatus(@Path("id") id: Long): Call<ResponseMessage<ProductDTO>>
+
+    @GET("products/favourites")
+    fun getCurrentUserFavourites(): Call<ResponseMessage<List<ProductDTO>>>
 }

@@ -19,4 +19,6 @@
     <string name="iv_star_contentDescription">Star</string>
     <string name="places_api_key">AIzaSyAIYZY6mrRDnFWRS-A4r2wZht9QiiDfRmQ</string>
     <string name="current_user_marker">Vaša lokacija</string>
+    <string name="mb_logout_text">Odjavi se</string>
+    <string name="tv_favourites_text">Moji favoriti</string>
 </resources>

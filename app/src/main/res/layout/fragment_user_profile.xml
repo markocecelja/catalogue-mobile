@@ -6,23 +6,61 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
-        android:id="@+id/tv_username"
+        android:id="@+id/tv_userInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="40sp"
-        tools:text="Username"/>
+        android:textSize="@dimen/title_large"
+        app:drawableStartCompat="@drawable/account"
+        android:drawablePadding="@dimen/padding_small"
+        tools:text="Ime Prezime"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_large"/>
 
-    <Button
-        android:id="@+id/b_logout"
-        android:layout_width="100dp"
+    <TextView
+        android:id="@+id/tv_favourites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_userInfo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rv_favourites"
+        android:textSize="@dimen/title_large"
+        android:text="@string/tv_favourites_text"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_large"
+        app:drawableStartCompat="@drawable/favourite_added"
+        android:drawablePadding="@dimen/padding_small"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_favourites"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_favourite"
+        app:layout_constraintTop_toBottomOf="@id/tv_favourites"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mb_logout"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:theme="@style/Theme.MaterialComponents"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_small"
-        android:text="Odjavi se"
+        android:text="@string/mb_logout_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_username"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cornerRadius="8dp"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp"
+        app:backgroundTint="@color/primary_app_color"
+        android:textColor="@color/white"
+        android:drawableStart="@drawable/logout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
