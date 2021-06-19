@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="@id/guid_end_vertical"
         tools:text="@tools:sample/lorem"
         android:maxLines="1"
-        android:textSize="20sp"
+        android:textSize="@dimen/title_medium"
         android:padding="@dimen/padding_medium"
         android:background="@drawable/product_border"
         android:gravity="center"

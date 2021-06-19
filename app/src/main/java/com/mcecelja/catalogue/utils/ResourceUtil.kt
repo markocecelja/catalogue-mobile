@@ -4,9 +4,9 @@ import com.mcecelja.catalogue.R
 
 fun getStarForOrganizationPosition(position: Int): Int {
     return when (position) {
-        0 -> R.drawable.star_gold
-        1 -> R.drawable.star_silver
-        2 -> R.drawable.star_bronze
+        0 -> R.drawable.coin_gold
+        1 -> R.drawable.coin_silver
+        2 -> R.drawable.coin_bronze
         else -> 0
     }
 }

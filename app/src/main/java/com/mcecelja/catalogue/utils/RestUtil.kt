@@ -12,18 +12,15 @@ class RestUtil {
 
     companion object {
         private val builder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(EnvironmentEnum.LOCAL_NETWORK.url)
+            .baseUrl(EnvironmentEnum.PROD.url)
             .addConverterFactory(GsonConverterFactory.create())
 
-        private val okHttpClient = OkHttpClient.Builder()
+        private var retrofit = builder.build()
+
+        private val httpClient = OkHttpClient.Builder()
             .connectTimeout(1, TimeUnit.MINUTES)
             .readTimeout(1, TimeUnit.MINUTES)
             .writeTimeout(1, TimeUnit.MINUTES)
-            .build()
-
-        private var retrofit = builder.client(okHttpClient).build()
-
-        private val httpClient = OkHttpClient.Builder()
 
         fun <S> createService(serviceClass: Class<S>): S {
             return retrofit.create(serviceClass)

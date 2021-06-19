@@ -4,16 +4,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mcecelja.catalogue.R
-import com.mcecelja.catalogue.data.dto.organization.OrganizationWithPriceDTO
+import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
+import com.mcecelja.catalogue.listener.OrganizationItemClickListener
 
-class OrganizationAdapter (organizations: List<OrganizationWithPriceDTO>) : RecyclerView.Adapter<OrganizationViewHolder>() {
+class OrganizationAdapter(
+    organizations: List<OrganizationDTO>,
+    private val organizationItemClickListener: OrganizationItemClickListener
+) : RecyclerView.Adapter<OrganizationViewHolder>() {
 
-    private val organizations: MutableList<OrganizationWithPriceDTO> = mutableListOf()
+    private val organizations: MutableList<OrganizationDTO> = mutableListOf()
+
     init {
         refreshData(organizations)
     }
 
-    fun refreshData(organizations: List<OrganizationWithPriceDTO>) {
+    private fun refreshData(organizations: List<OrganizationDTO>) {
         this.organizations.clear()
         this.organizations.addAll(organizations)
         this.notifyDataSetChanged()
@@ -28,8 +33,7 @@ class OrganizationAdapter (organizations: List<OrganizationWithPriceDTO>) : Recy
 
     override fun onBindViewHolder(holder: OrganizationViewHolder, position: Int) {
         val organization = organizations[position]
-        holder.bind(organization, position)
-
+        holder.bind(organization, position, organizationItemClickListener)
     }
 
     override fun getItemCount(): Int {

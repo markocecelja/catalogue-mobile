@@ -21,7 +21,7 @@ import com.mcecelja.catalogue.listener.ProductItemClickListener
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.MainActivity
-import com.mcecelja.catalogue.ui.organization.OrganizationFragment
+import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -140,8 +140,8 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationFragment.create(productViewModel.products.value!![position]),
-                OrganizationFragment.TAG
+                OrganizationsListFragment.create(productViewModel.products.value!![position]),
+                OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)
             .commit()

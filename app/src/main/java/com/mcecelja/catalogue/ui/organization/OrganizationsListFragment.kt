@@ -9,15 +9,19 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcecelja.catalogue.Catalogue
+import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.adapters.organization.OrganizationAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
+import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
-import com.mcecelja.catalogue.databinding.FragmentOrganizationsBinding
+import com.mcecelja.catalogue.databinding.FragmentOrganizationsListBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
+import com.mcecelja.catalogue.listener.OrganizationItemClickListener
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.MainActivity
+import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import com.mcecelja.catalogue.utils.getFavouriteResourceForStatus
@@ -26,9 +30,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class OrganizationFragment : Fragment() {
+class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
-    private lateinit var organizationsBinding: FragmentOrganizationsBinding
+    private lateinit var binding: FragmentOrganizationsListBinding
 
     private val organizationViewModel by viewModel<OrganizationViewModel>()
 
@@ -45,7 +49,7 @@ class OrganizationFragment : Fragment() {
             }
         })
 
-        organizationsBinding = FragmentOrganizationsBinding.inflate(inflater, container, false)
+        binding = FragmentOrganizationsListBinding.inflate(inflater, container, false)
 
         arguments?.let {
             val product = it.getSerializable(PRODUCT) as ProductDTO
@@ -53,7 +57,7 @@ class OrganizationFragment : Fragment() {
             organizationViewModel.setProduct(product)
         }
 
-        organizationsBinding.ivFavourite.setOnClickListener { changeFavouriteStatus(organizationViewModel.product.value!!) }
+        binding.ivFavourite.setOnClickListener { changeFavouriteStatus(organizationViewModel.product.value!!) }
 
         loadingViewModel.loadingVisibility.observe(
             viewLifecycleOwner,
@@ -63,21 +67,21 @@ class OrganizationFragment : Fragment() {
             viewLifecycleOwner,
             { setupProduct(it) })
 
-        return organizationsBinding.root
+        return binding.root
     }
 
     private fun setupProduct(product: ProductDTO) {
-        organizationsBinding.tvProductName.text = product.name
-        organizationsBinding.ivFavourite.setImageResource(getFavouriteResourceForStatus(product.currentUserFavourite))
+        binding.tvProductName.text = product.name
+        binding.ivFavourite.setImageResource(getFavouriteResourceForStatus(product.currentUserFavourite))
     }
 
     private fun setupRecyclerView(product: ProductDTO) {
-        organizationsBinding.rvOrganizations.layoutManager = LinearLayoutManager(
+        binding.rvOrganizations.layoutManager = LinearLayoutManager(
             context,
             LinearLayoutManager.VERTICAL,
             false
         )
-        organizationsBinding.rvOrganizations.adapter = OrganizationAdapter(product.organizations)
+        binding.rvOrganizations.adapter = OrganizationAdapter(product.organizations, this)
     }
 
     private fun changeFavouriteStatus(product: ProductDTO) {
@@ -127,13 +131,24 @@ class OrganizationFragment : Fragment() {
         })
     }
 
+    override fun onOrganizationClicked(organization: OrganizationDTO) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.fl_fragmentContainer,
+                OrganizationDetailsFragment.create(organization),
+                OrganizationDetailsFragment.TAG
+            )
+            .addToBackStack(TAG)
+            .commit()
+    }
+
     companion object {
-        const val TAG = "Organization"
+        const val TAG = "Organizations list"
         private const val PRODUCT = "Product"
-        fun create(product: ProductDTO): OrganizationFragment {
+        fun create(product: ProductDTO): OrganizationsListFragment {
             val args = Bundle()
             args.putSerializable(PRODUCT, product)
-            val fragment = OrganizationFragment()
+            val fragment = OrganizationsListFragment()
             fragment.arguments = args
             return fragment
         }

@@ -55,8 +55,20 @@
         android:layout_height="48dp"
         app:layout_constraintTop_toTopOf="@id/iv_store"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/iv_price"
+        app:layout_constraintBottom_toBottomOf="@id/rb"
         android:contentDescription="@string/iv_star_contentDescription"
-        tools:src="@drawable/star_gold"/>
+        tools:src="@drawable/coin_gold"/>
+
+    <RatingBar
+        android:id="@+id/rb"
+        style="@style/Widget.AppCompat.RatingBar.Small"
+        android:theme="@style/primaryRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/iv_price"
+        app:layout_constraintStart_toStartOf="parent"
+        android:numStars="5"
+        tools:rating="4.5"
+        android:layout_marginTop="@dimen/margin_small" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

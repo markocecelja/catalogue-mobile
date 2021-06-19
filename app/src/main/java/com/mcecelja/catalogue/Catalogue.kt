@@ -1,6 +1,7 @@
 package com.mcecelja.catalogue
 
 import android.app.Application
+import com.mcecelja.catalogue.di.appModule
 import com.mcecelja.catalogue.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -16,7 +17,7 @@ class Catalogue : Application() {
         application = this
         startKoin {
             androidContext(this@Catalogue)
-            modules(viewModelModule)
+            modules(appModule, viewModelModule)
         }
     }
 }
