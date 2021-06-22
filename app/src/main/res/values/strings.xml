@@ -22,4 +22,5 @@
     <string name="mb_logout_text">Odjavi se</string>
     <string name="tv_favourites_text">Moji favoriti</string>
     <string name="tv_recension_text">Moje recenzije</string>
+    <string name="mandatory_field">Ovo polje je obavezno!</string>
 </resources>

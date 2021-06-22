@@ -36,6 +36,11 @@ class RegisterFragment : Fragment() {
     }
 
     private fun registerUser() {
+
+        if(!validateInputFields()) {
+            return
+        }
+
         val registerRequestDTO = RegisterRequestDTO(
             binding.etName.text.toString(),
             binding.etSurname.text.toString(),
@@ -83,6 +88,55 @@ class RegisterFragment : Fragment() {
                     .show()
             }
         })
+    }
+
+    private fun validateInputFields(): Boolean {
+
+        var isValid = true
+
+        if (binding.etName.text.isNullOrEmpty()) {
+            binding.tilName.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            binding.tilName.error = null
+        }
+
+        if (binding.etSurname.text.isNullOrEmpty()) {
+            binding.tilSurname.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            binding.tilSurname.error = null
+        }
+
+        if (binding.etUsername.text.isNullOrEmpty()) {
+            binding.tilUsername.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            binding.tilUsername.error = null
+        }
+
+        if (binding.etEmail.text.isNullOrEmpty()) {
+            binding.tilEmail.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            binding.tilEmail.error = null
+        }
+
+        if (binding.etPassword.text.isNullOrEmpty()) {
+            binding.tilPassword.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            binding.tilPassword.error = null
+        }
+
+        if (binding.etPasswordConfirm.text.isNullOrEmpty()) {
+            binding.tilPasswordConfirm.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            binding.tilPasswordConfirm.error = null
+        }
+
+        return isValid
     }
 
     companion object {

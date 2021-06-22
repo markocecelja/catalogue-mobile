@@ -37,18 +37,22 @@ class LoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                requireActivity().finishAffinity()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finishAffinity()
+                }
+            })
 
         loginBinding = FragmentLoginBinding.inflate(inflater, container, false)
 
         loginBinding.mbLogin.setOnClickListener { loginUser() }
         loginBinding.tvSignUp.setOnClickListener { openRegisterFragment() }
 
-        loadingViewModel.loadingVisibility.observe(viewLifecycleOwner, { (activity as LoginActivity).setupLoadingScreen(it) })
+        loadingViewModel.loadingVisibility.observe(
+            viewLifecycleOwner,
+            { (activity as LoginActivity).setupLoadingScreen(it) })
 
         return loginBinding.root
     }
@@ -66,13 +70,7 @@ class LoginFragment : Fragment() {
 
     private fun loginUser() {
 
-        if(loginBinding.etUsername.text.isNullOrEmpty()) {
-            loginBinding.etUsername.error = "Ovo polje je obavezno!"
-            return
-        }
-
-        if(loginBinding.etPassword.text.isNullOrEmpty()) {
-            loginBinding.etPassword.error = "Ovo polje je obavezno!"
+        if(!validateInputFields()) {
             return
         }
 
@@ -102,7 +100,10 @@ class LoginFragment : Fragment() {
                             activity
                         )
                     } else {
-                        PreferenceManager.savePreference(PreferenceEnum.TOKEN, response.body()?.payload?.jwt)
+                        PreferenceManager.savePreference(
+                            PreferenceEnum.TOKEN,
+                            response.body()?.payload?.jwt
+                        )
                         val mainIntent = Intent(Catalogue.application, MainActivity::class.java)
                         startActivity(mainIntent)
                     }
@@ -123,6 +124,27 @@ class LoginFragment : Fragment() {
                     .show()
             }
         })
+    }
+
+    private fun validateInputFields(): Boolean {
+
+        var isValid = true
+
+        if (loginBinding.etUsername.text.isNullOrEmpty()) {
+            loginBinding.tilUsername.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            loginBinding.tilUsername.error = null
+        }
+
+        if (loginBinding.etPassword.text.isNullOrEmpty()) {
+            loginBinding.tilPassword.error = getString(R.string.mandatory_field)
+            isValid = false
+        } else {
+            loginBinding.tilPassword.error = null
+        }
+
+        return isValid
     }
 
     companion object {
