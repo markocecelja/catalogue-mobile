@@ -13,7 +13,7 @@ interface PlacesService {
         @Query("location") location: CoordinatesDTO,
         @Query("radius") radius: Int,
         @Query("type") type: String,
-        @Query("name") name: String,
+        @Query("keyword") name: String,
         @Query("key") key: String
     ): Call<PlacesResponseDTO>
 }

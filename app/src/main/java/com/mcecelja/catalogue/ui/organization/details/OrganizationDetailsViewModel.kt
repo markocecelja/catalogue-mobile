@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.mcecelja.catalogue.Catalogue
+import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
@@ -42,7 +43,9 @@ class OrganizationDetailsViewModel : ViewModel() {
         val apiCall =
             RestUtil.createService(
                 OrganizationService::class.java, PreferenceManager.getPreference(
-                    PreferenceEnum.TOKEN)).leaveRecension(_organization.value!!.id, RatingDTO(grade))
+                    PreferenceEnum.TOKEN
+                )
+            ).leaveRecension(_organization.value!!.id, RatingDTO(grade))
 
         apiCall.enqueue(object : Callback<ResponseMessage<OrganizationDTO>> {
             override fun onResponse(
@@ -86,7 +89,7 @@ class OrganizationDetailsViewModel : ViewModel() {
             PlacesUtil.createService(PlacesService::class.java).getNearbyPlaces(
                 CoordinatesDTO(locationModel.latitude, locationModel.longitude),
                 5000,
-                "supermarket",
+                Catalogue.application.getString(R.string.places_type_filter),
                 _organization.value!!.name,
                 apiKey
             )
@@ -97,7 +100,18 @@ class OrganizationDetailsViewModel : ViewModel() {
                 response: Response<PlacesResponseDTO>
             ) {
                 if (response.isSuccessful) {
-                    _places.value = response.body()!!.results
+
+                    val responsePlaces = response.body()!!.results.toMutableList()
+
+                    val iterator: MutableIterator<PlaceDTO> = responsePlaces.iterator()
+                    while (iterator.hasNext()) {
+                        val responsePlace = iterator.next()
+                        if (!responsePlace.name.contains(_organization.value!!.name, true)) {
+                            iterator.remove()
+                        }
+                    }
+
+                    _places.value = responsePlaces
                 }
             }
 

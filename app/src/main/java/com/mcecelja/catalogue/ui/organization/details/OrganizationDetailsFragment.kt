@@ -93,12 +93,6 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
         mMap = googleMap
 
         val currentLocation = LatLng(0.0, 0.0)
-        mapsViewModel.setMarker(
-            mMap.addMarker(
-                MarkerOptions().position(currentLocation)
-                    .title(getString(R.string.current_user_marker))
-            )
-        )
         mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation))
         invokeLocationAction()
     }
@@ -108,7 +102,10 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
             ActivityCompat.checkSelfPermission(
                 Catalogue.application,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) -> startLocationUpdate()
+            ) -> {
+                startLocationUpdate()
+                mMap.isMyLocationEnabled = true
+            }
             else -> ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -131,7 +128,6 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
             locationModel,
             getString(R.string.places_api_key)
         )
-
     }
 
     private fun updateMapPlaces(places: List<PlaceDTO>) {
