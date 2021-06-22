@@ -9,19 +9,21 @@ import androidx.fragment.app.Fragment
 import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.adapters.favourites.FavouritesAdapter
+import com.mcecelja.catalogue.adapters.recension.RecensionAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
+import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.FavouriteItemClickListener
+import com.mcecelja.catalogue.listener.OrganizationItemClickListener
+import com.mcecelja.catalogue.ui.catalogue.MainActivity
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
 
-class UserProfileFragment : Fragment(), FavouriteItemClickListener {
+class UserProfileFragment : Fragment(), FavouriteItemClickListener, OrganizationItemClickListener {
 
     private lateinit var userProfileBinding: FragmentUserProfileBinding
-
-    private val userProfileViewModel by viewModel<UserProfileViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,26 +33,33 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener {
         userProfileBinding = FragmentUserProfileBinding.inflate(inflater, container, false)
 
         userProfileBinding.rvFavourites.adapter = FavouritesAdapter(mutableListOf(), this)
+        userProfileBinding.rvRecension.adapter =
+            RecensionAdapter(mutableListOf(), this)
         userProfileBinding.mbLogout.setOnClickListener { logout() }
 
-        userProfileViewModel.setUser()
+        (requireActivity() as MainActivity).userProfileViewModel.setUser()
+        (requireActivity() as MainActivity).userProfileViewModel.setOrganizations()
 
-        userProfileViewModel.user.observe(
+        (requireActivity() as MainActivity).userProfileViewModel.user.observe(
             viewLifecycleOwner,
             {
                 userProfileBinding.tvUserInfo.text = String.format(
                     "%s %s",
-                    userProfileViewModel.user.value!!.firstName,
-                    userProfileViewModel.user.value!!.lastName
+                    it.firstName,
+                    it.lastName
                 )
             })
 
-        userProfileViewModel.favourites.observe(
+        (requireActivity() as MainActivity).userProfileViewModel.favourites.observe(
             viewLifecycleOwner,
             {
-                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(
-                    userProfileViewModel.favourites.value!!
-                )
+                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(it)
+            })
+
+        (requireActivity() as MainActivity).userProfileViewModel.userRatedOrganizations.observe(
+            viewLifecycleOwner,
+            {
+                (userProfileBinding.rvRecension.adapter as RecensionAdapter).refreshData(it)
             })
 
         return userProfileBinding.root
@@ -58,17 +67,29 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        userProfileViewModel.setFavourites(requireActivity())
+        (requireActivity() as MainActivity).userProfileViewModel.setFavourites(requireActivity())
+        (requireActivity() as MainActivity).userProfileViewModel.setOrganizations()
     }
 
     override fun onItemClicked(position: Int) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationsListFragment.create(userProfileViewModel.favourites.value!![position]),
+                OrganizationsListFragment.create((requireActivity() as MainActivity).userProfileViewModel.favourites.value!![position]),
                 OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)
+            .commit()
+    }
+
+    override fun onOrganizationClicked(organization: OrganizationDTO) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.fl_fragmentContainer,
+                OrganizationDetailsFragment.create(organization),
+                OrganizationDetailsFragment.TAG
+            )
+            .addToBackStack(OrganizationsListFragment.TAG)
             .commit()
     }
 

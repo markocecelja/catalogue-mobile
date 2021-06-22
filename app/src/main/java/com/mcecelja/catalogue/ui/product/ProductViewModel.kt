@@ -74,4 +74,17 @@ class ProductViewModel : ViewModel() {
             }
         })
     }
+
+    fun updateProduct(product: ProductDTO) {
+        val products = mutableListOf<ProductDTO>()
+        _products.value?.let{products.addAll(it)}
+
+        for (p in products) {
+            if(p.id == product.id) {
+                products[products.indexOf(p)] = product
+            }
+        }
+
+        setProducts(products)
+    }
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.R
@@ -22,6 +23,7 @@ import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.MainActivity
 import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
+import com.mcecelja.catalogue.ui.product.ProductViewModel
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import com.mcecelja.catalogue.utils.getFavouriteResourceForStatus
@@ -43,12 +45,6 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                requireActivity().supportFragmentManager.popBackStackImmediate()
-            }
-        })
-
         binding = FragmentOrganizationsListBinding.inflate(inflater, container, false)
 
         arguments?.let {
@@ -109,7 +105,10 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
                             activity
                         )
                     } else {
-                        response.body()?.payload?.let { organizationViewModel.setProduct(it) }
+                        response.body()?.payload?.let {
+                            organizationViewModel.setProduct(it)
+                            (requireActivity() as MainActivity).productViewModel.updateProduct(it)
+                        }
                     }
                 }
             }

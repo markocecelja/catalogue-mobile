@@ -34,8 +34,6 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
     private lateinit var productFragmentBinding: FragmentProductsBinding
 
-    private val productViewModel by viewModel<ProductViewModel>()
-
     private val loadingViewModel by viewModel<LoadingViewModel>()
 
     override fun onCreateView(
@@ -43,20 +41,13 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        requireActivity().supportFragmentManager.addOnBackStackChangedListener {
-            fetchProducts(
-                PreferenceManager.getPreference(PreferenceEnum.TOKEN),
-                productFragmentBinding.etSearch.text.toString()
-            )
-        }
-
         productFragmentBinding = FragmentProductsBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
 
         fetchProducts(PreferenceManager.getPreference(PreferenceEnum.TOKEN), null)
 
-        productViewModel.products.observe(
+        (requireActivity() as MainActivity).productViewModel.products.observe(
             viewLifecycleOwner,
             { (productFragmentBinding.rvProducts.adapter as ProductAdapter).refreshData(it) })
 
@@ -110,7 +101,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
                             activity
                         )
                     } else {
-                        productViewModel.setProducts(response.body()?.payload)
+                        (requireActivity() as MainActivity).productViewModel.setProducts(response.body()?.payload)
                     }
                 }
             }
@@ -133,14 +124,14 @@ class ProductFragment : Fragment(), ProductItemClickListener {
     }
 
     override fun onFavouriteClicked(position: Int) {
-        productViewModel.changeFavouriteStatusForPosition(position, activity, loadingViewModel)
+        (requireActivity() as MainActivity).productViewModel.changeFavouriteStatusForPosition(position, activity, loadingViewModel)
     }
 
     override fun onProductClicked(position: Int) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationsListFragment.create(productViewModel.products.value!![position]),
+                OrganizationsListFragment.create((requireActivity() as MainActivity).productViewModel.products.value!![position]),
                 OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)

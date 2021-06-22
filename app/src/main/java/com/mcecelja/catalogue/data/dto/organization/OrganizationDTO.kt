@@ -6,5 +6,6 @@ data class OrganizationDTO(
     val id: Long,
     val name: String,
     val price: Float,
-    val averageRating: Float
+    val averageRating: Float,
+    val currentUserRating: RatingDTO?
 ) : Serializable

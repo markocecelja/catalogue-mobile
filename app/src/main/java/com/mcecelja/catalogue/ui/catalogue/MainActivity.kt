@@ -10,10 +10,17 @@ import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.databinding.ActivityMainBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.ui.login.LoginActivity
+import com.mcecelja.catalogue.ui.product.ProductViewModel
+import com.mcecelja.catalogue.ui.userprofile.UserProfileViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
+
+    val productViewModel by viewModel<ProductViewModel>()
+
+    val userProfileViewModel by viewModel<UserProfileViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +35,7 @@ class MainActivity : AppCompatActivity() {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
         } else {
-            if(savedInstanceState == null){
+            if (savedInstanceState == null) {
                 supportFragmentManager.beginTransaction()
                     .add(R.id.fl_fragmentContainer, TabFragment.create(), TabFragment.TAG)
                     .commit()
@@ -39,14 +46,15 @@ class MainActivity : AppCompatActivity() {
     fun setupLoadingScreen(visibility: Int) {
         mainBinding.rlMain.visibility = visibility
 
-        if(visibility == View.VISIBLE) {
+        if (visibility == View.VISIBLE) {
             this.window?.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
         } else {
             this.window?.clearFlags(
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
         }
     }
-
 }

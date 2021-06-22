@@ -62,7 +62,10 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
 
         organizationDetailsViewModel.organization.observe(
             viewLifecycleOwner,
-            { binding.tvStore.text = it.name })
+            { setOrganization(it) }
+        )
+
+        binding.rb.setOnRatingBarChangeListener { _, rating, _ -> organizationDetailsViewModel.leaveRecension(rating.toInt(), requireActivity()) }
 
         organizationDetailsViewModel.places.observe(viewLifecycleOwner, { updateMapPlaces(it) })
 
@@ -76,6 +79,14 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         return binding.root
+    }
+
+    private fun setOrganization(organization: OrganizationDTO) {
+        binding.tvStore.text = organization.name
+
+        if(organization.currentUserRating != null) {
+            binding.rb.rating = organization.currentUserRating.grade.toFloat()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

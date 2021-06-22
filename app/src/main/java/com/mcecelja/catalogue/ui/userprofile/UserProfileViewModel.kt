@@ -8,9 +8,11 @@ import androidx.lifecycle.ViewModel
 import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
+import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.enums.PreferenceEnum
+import com.mcecelja.catalogue.services.OrganizationService
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.services.UserService
 import com.mcecelja.catalogue.utils.AlertUtil
@@ -27,9 +29,16 @@ class UserProfileViewModel : ViewModel() {
     private val _user: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
     val user: LiveData<UserDTO> = _user
 
+    private val _userRatedOrganizations: MutableLiveData<List<OrganizationDTO>> =
+        MutableLiveData<List<OrganizationDTO>>()
+    val userRatedOrganizations: LiveData<List<OrganizationDTO>> = _userRatedOrganizations
+
     fun setFavourites(activity: FragmentActivity) {
         val apiCall =
-            RestUtil.createService(ProductService::class.java, PreferenceManager.getPreference(PreferenceEnum.TOKEN)).getCurrentUserFavourites()
+            RestUtil.createService(
+                ProductService::class.java,
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
+            ).getCurrentUserFavourites()
 
         apiCall.enqueue(object : Callback<ResponseMessage<List<ProductDTO>>> {
             override fun onResponse(
@@ -43,13 +52,44 @@ class UserProfileViewModel : ViewModel() {
                             activity
                         )
                     } else {
-                       _favourites.value = response.body()?.payload
+                        _favourites.value = response.body()?.payload
                     }
                 }
             }
 
             override fun onFailure(
                 call: Call<ResponseMessage<List<ProductDTO>>>,
+                t: Throwable
+            ) {
+                Toast.makeText(
+                    Catalogue.application,
+                    "Get favourites failed!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+        })
+    }
+
+    fun setOrganizations() {
+        val apiCall =
+            RestUtil.createService(
+                OrganizationService::class.java,
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
+            ).getCurrentUserRatedOrganizations()
+
+        apiCall.enqueue(object : Callback<ResponseMessage<List<OrganizationDTO>>> {
+            override fun onResponse(
+                call: Call<ResponseMessage<List<OrganizationDTO>>>,
+                response: Response<ResponseMessage<List<OrganizationDTO>>>
+            ) {
+                if (response.isSuccessful) {
+                    _userRatedOrganizations.value = response.body()?.payload
+                }
+            }
+
+            override fun onFailure(
+                call: Call<ResponseMessage<List<OrganizationDTO>>>,
                 t: Throwable
             ) {
                 Toast.makeText(
@@ -88,5 +128,18 @@ class UserProfileViewModel : ViewModel() {
                     .show()
             }
         })
+    }
+
+    fun updateOrganization(organization: OrganizationDTO) {
+        val organizations = mutableListOf<OrganizationDTO>()
+        _userRatedOrganizations.value?.let{organizations.addAll(it)}
+
+        for (o in organizations) {
+            if(o.id == organization.id) {
+                organizations[organizations.indexOf(o)] = organization
+            }
+        }
+
+        _userRatedOrganizations.value = organizations
     }
 }
