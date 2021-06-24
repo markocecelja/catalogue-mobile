@@ -12,7 +12,7 @@ class RestUtil {
 
     companion object {
         private val builder: Retrofit.Builder = Retrofit.Builder()
-            .baseUrl(EnvironmentEnum.PROD.url)
+            .baseUrl(EnvironmentEnum.LOCAL_NETWORK.url)
             .addConverterFactory(GsonConverterFactory.create())
 
         private var retrofit = builder.build()

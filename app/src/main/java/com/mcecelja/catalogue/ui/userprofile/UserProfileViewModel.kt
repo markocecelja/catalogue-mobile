@@ -9,6 +9,7 @@ import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
+import com.mcecelja.catalogue.data.dto.places.PlaceDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.enums.PreferenceEnum
@@ -132,11 +133,17 @@ class UserProfileViewModel : ViewModel() {
 
     fun updateOrganization(organization: OrganizationDTO) {
         val organizations = mutableListOf<OrganizationDTO>()
-        _userRatedOrganizations.value?.let{organizations.addAll(it)}
+        _userRatedOrganizations.value?.let { organizations.addAll(it) }
 
-        for (o in organizations) {
-            if(o.id == organization.id) {
-                organizations[organizations.indexOf(o)] = organization
+        val iterator: MutableIterator<OrganizationDTO> = organizations.iterator()
+        while (iterator.hasNext()) {
+            val o = iterator.next()
+            if (o.id == organization.id) {
+                if (organization.currentUserRating != null) {
+                    organizations[organizations.indexOf(o)] = organization
+                } else {
+                    organizations.remove(o)
+                }
             }
         }
 
