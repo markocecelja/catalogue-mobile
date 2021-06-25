@@ -1,5 +1,6 @@
-package com.mcecelja.catalogue.ui.userprofile
+package com.mcecelja.catalogue.ui.catalogue
 
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
@@ -9,23 +10,23 @@ import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
-import com.mcecelja.catalogue.data.dto.places.PlaceDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.services.OrganizationService
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.services.UserService
+import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.utils.AlertUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class UserProfileViewModel : ViewModel() {
+class CatalogueViewModel : ViewModel() {
 
-    private val _favourites: MutableLiveData<List<ProductDTO>> = MutableLiveData<List<ProductDTO>>()
-    val favourites: LiveData<List<ProductDTO>> = _favourites
+    private val _products: MutableLiveData<List<ProductDTO>> = MutableLiveData<List<ProductDTO>>()
+    val products: LiveData<List<ProductDTO>> = _products
 
     private val _user: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
     val user: LiveData<UserDTO> = _user
@@ -34,26 +35,35 @@ class UserProfileViewModel : ViewModel() {
         MutableLiveData<List<OrganizationDTO>>()
     val userRatedOrganizations: LiveData<List<OrganizationDTO>> = _userRatedOrganizations
 
-    fun setFavourites(activity: FragmentActivity) {
+    fun setProducts(
+        token: String,
+        name: String?,
+        activity: FragmentActivity,
+        loadingViewModel: LoadingViewModel
+    ) {
+
         val apiCall =
-            RestUtil.createService(
-                ProductService::class.java,
-                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
-            ).getCurrentUserFavourites()
+            RestUtil.createService(ProductService::class.java, token).getProducts(name)
+
+        loadingViewModel.changeVisibility(View.VISIBLE)
 
         apiCall.enqueue(object : Callback<ResponseMessage<List<ProductDTO>>> {
             override fun onResponse(
                 call: Call<ResponseMessage<List<ProductDTO>>>,
                 response: Response<ResponseMessage<List<ProductDTO>>>
             ) {
+
+                loadingViewModel.changeVisibility(View.INVISIBLE)
+
                 if (response.isSuccessful) {
+
                     if (response.body()?.errorCode != null) {
                         AlertUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
                     } else {
-                        _favourites.value = response.body()?.payload
+                        _products.value = response.body()?.payload
                     }
                 }
             }
@@ -62,9 +72,12 @@ class UserProfileViewModel : ViewModel() {
                 call: Call<ResponseMessage<List<ProductDTO>>>,
                 t: Throwable
             ) {
+
+                loadingViewModel.changeVisibility(View.INVISIBLE)
+
                 Toast.makeText(
                     Catalogue.application,
-                    "Get favourites failed!",
+                    "Get products failed!",
                     Toast.LENGTH_SHORT
                 )
                     .show()
@@ -148,5 +161,79 @@ class UserProfileViewModel : ViewModel() {
         }
 
         _userRatedOrganizations.value = organizations
+    }
+
+    fun changeFavouriteStatusForProduct(
+        product: ProductDTO,
+        activity: FragmentActivity?,
+        loadingViewModel: LoadingViewModel
+    ) {
+        val products = mutableListOf<ProductDTO>()
+        _products.value?.let { products.addAll(it) }
+
+        val apiCall =
+            RestUtil.createService(
+                ProductService::class.java,
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
+            ).changeFavouriteStatus(product.id)
+
+        loadingViewModel.changeVisibility(View.VISIBLE)
+
+        apiCall.enqueue(object : Callback<ResponseMessage<ProductDTO>> {
+            override fun onResponse(
+                call: Call<ResponseMessage<ProductDTO>>,
+                response: Response<ResponseMessage<ProductDTO>>
+            ) {
+                loadingViewModel.changeVisibility(View.INVISIBLE)
+
+                if (response.isSuccessful) {
+
+                    if (response.body()?.errorCode != null) {
+                        AlertUtil.showAlertMessageForErrorCode(
+                            response.body()!!.errorCode,
+                            activity
+                        )
+                    } else {
+                        response.body()?.payload?.let {
+
+                            val iterator: MutableIterator<ProductDTO> = products.iterator()
+
+                            while (iterator.hasNext()) {
+                                val p = iterator.next()
+                                if (p.id == product.id) {
+                                    products[products.indexOf(p)] = it
+                                }
+                            }
+                            _products.value = products
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(
+                call: Call<ResponseMessage<ProductDTO>>,
+                t: Throwable
+            ) {
+
+                loadingViewModel.changeVisibility(View.INVISIBLE)
+
+                Toast.makeText(
+                    Catalogue.application,
+                    "Change favourite status failed!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+        })
+    }
+
+    fun getProductById(id: Long): ProductDTO? {
+        for (product in _products.value!!) {
+            if (product.id == id) {
+                return product;
+            }
+        }
+
+        return null;
     }
 }

@@ -63,7 +63,7 @@ class OrganizationDetailsViewModel : ViewModel() {
                     } else {
                         response.body()?.payload?.let {
                             _organization.value = it
-                            (activity as MainActivity).userProfileViewModel.updateOrganization(it)
+                            (activity as MainActivity).catalogueViewModel.updateOrganization(it)
                         }
                     }
                 }

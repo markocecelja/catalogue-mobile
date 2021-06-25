@@ -6,24 +6,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.adapters.favourites.FavouritesAdapter
 import com.mcecelja.catalogue.adapters.recension.RecensionAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
+import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.FavouriteItemClickListener
 import com.mcecelja.catalogue.listener.OrganizationItemClickListener
-import com.mcecelja.catalogue.ui.catalogue.MainActivity
+import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
 import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
+import java.util.stream.Collectors
 
 class UserProfileFragment : Fragment(), FavouriteItemClickListener, OrganizationItemClickListener {
 
     private lateinit var userProfileBinding: FragmentUserProfileBinding
+
+    private lateinit var catalogueViewModel: CatalogueViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,15 +37,17 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
     ): View {
         userProfileBinding = FragmentUserProfileBinding.inflate(inflater, container, false)
 
-        userProfileBinding.rvFavourites.adapter = FavouritesAdapter(mutableListOf(), this)
-        userProfileBinding.rvRecension.adapter =
-            RecensionAdapter(mutableListOf(), this)
+        ViewModelProvider(requireActivity()).get(CatalogueViewModel::class.java).also {
+            catalogueViewModel = it
+        }
+
+        setupRecyclers()
+
         userProfileBinding.mbLogout.setOnClickListener { logout() }
 
-        (requireActivity() as MainActivity).userProfileViewModel.setUser()
-        (requireActivity() as MainActivity).userProfileViewModel.setOrganizations()
+        catalogueViewModel.setUser()
 
-        (requireActivity() as MainActivity).userProfileViewModel.user.observe(
+        catalogueViewModel.user.observe(
             viewLifecycleOwner,
             {
                 userProfileBinding.tvUserInfo.text = String.format(
@@ -50,13 +57,15 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
                 )
             })
 
-        (requireActivity() as MainActivity).userProfileViewModel.favourites.observe(
+        catalogueViewModel.products.observe(
             viewLifecycleOwner,
             {
-                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(it)
+                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(
+                    getUserFavouritesFromProduct(it)
+                )
             })
 
-        (requireActivity() as MainActivity).userProfileViewModel.userRatedOrganizations.observe(
+        catalogueViewModel.userRatedOrganizations.observe(
             viewLifecycleOwner,
             {
                 (userProfileBinding.rvRecension.adapter as RecensionAdapter).refreshData(it)
@@ -65,17 +74,41 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
         return userProfileBinding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as MainActivity).userProfileViewModel.setFavourites(requireActivity())
-        (requireActivity() as MainActivity).userProfileViewModel.setOrganizations()
+    private fun setupRecyclers() {
+
+        userProfileBinding.rvFavourites.adapter = FavouritesAdapter(
+            getUserFavouritesFromProduct(catalogueViewModel.products.value ?: mutableListOf()), this
+        )
+
+        userProfileBinding.rvRecension.adapter = RecensionAdapter(
+            catalogueViewModel.userRatedOrganizations.value ?: mutableListOf(),
+            this
+        )
     }
 
-    override fun onItemClicked(position: Int) {
+    private fun getUserFavouritesFromProduct(products: List<ProductDTO>): List<ProductDTO> {
+        var favourites: MutableList<ProductDTO> = mutableListOf()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            favourites =
+                products.stream().filter { it.currentUserFavourite }.collect(Collectors.toList())
+        } else {
+            for (product in products) {
+                if (product.currentUserFavourite) {
+                    favourites.add(product)
+                }
+            }
+        }
+
+        return favourites
+    }
+
+    override fun onItemClicked(product: ProductDTO) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationsListFragment.create((requireActivity() as MainActivity).userProfileViewModel.favourites.value!![position]),
+                OrganizationsListFragment.create(
+                    product
+                ),
                 OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)

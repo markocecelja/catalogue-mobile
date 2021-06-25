@@ -9,18 +9,17 @@ import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.databinding.ActivityMainBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
+import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.login.LoginActivity
-import com.mcecelja.catalogue.ui.product.ProductViewModel
-import com.mcecelja.catalogue.ui.userprofile.UserProfileViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
 
-    val productViewModel by viewModel<ProductViewModel>()
+    val catalogueViewModel by viewModel<CatalogueViewModel>()
 
-    val userProfileViewModel by viewModel<UserProfileViewModel>()
+    private val loadingViewModel by viewModel<LoadingViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +27,19 @@ class MainActivity : AppCompatActivity() {
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(mainBinding.root)
+
+        catalogueViewModel.setProducts(
+            PreferenceManager.getPreference(PreferenceEnum.TOKEN),
+            null,
+            this,
+            loadingViewModel
+        )
+        catalogueViewModel.setOrganizations()
+        catalogueViewModel.setUser()
+
+        loadingViewModel.loadingVisibility.observe(
+            this,
+            { setupLoadingScreen(it) })
 
         val token = PreferenceManager.getPreference(PreferenceEnum.TOKEN)
 

@@ -1,8 +1,10 @@
 package com.mcecelja.catalogue.listener
 
+import com.mcecelja.catalogue.data.dto.product.ProductDTO
+
 interface ProductItemClickListener {
 
-    fun onFavouriteClicked(position: Int)
+    fun onFavouriteClicked(product: ProductDTO)
 
     fun onProductClicked(position: Int)
 }
