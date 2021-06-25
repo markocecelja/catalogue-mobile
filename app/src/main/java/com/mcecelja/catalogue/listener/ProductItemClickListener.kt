@@ -6,5 +6,5 @@ interface ProductItemClickListener {
 
     fun onFavouriteClicked(product: ProductDTO)
 
-    fun onProductClicked(position: Int)
+    fun onProductClicked(product: ProductDTO)
 }

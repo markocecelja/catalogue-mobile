@@ -16,6 +16,6 @@ class ProductViewHolder(itemView: View) :
         itemBinding.ivFavourite.setImageResource(getFavouriteResourceForStatus(product.currentUserFavourite))
 
         itemBinding.ivFavourite.setOnClickListener { productItemClickListener.onFavouriteClicked(product) }
-        itemBinding.tvProductName.setOnClickListener { productItemClickListener.onProductClicked(position) }
+        itemBinding.tvProductName.setOnClickListener { productItemClickListener.onProductClicked(product) }
     }
 }

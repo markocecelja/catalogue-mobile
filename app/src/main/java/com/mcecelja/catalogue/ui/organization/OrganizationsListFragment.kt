@@ -39,9 +39,10 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
             catalogueViewModel = it
         }
 
+        setupRecyclerView()
+
         arguments?.let {
             val product = it.getSerializable(PRODUCT) as ProductDTO
-            setupRecyclerView(product)
             setupProduct(product)
 
             binding.ivFavourite.setOnClickListener {
@@ -57,6 +58,10 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
                 { setupProduct(catalogueViewModel.getProductById(product.id)!!) })
         }
 
+        catalogueViewModel.currentProductOrganizations.observe(
+            viewLifecycleOwner,
+            {  (binding.rvOrganizations.adapter as OrganizationAdapter).refreshData(it) })
+
         loadingViewModel.loadingVisibility.observe(
             viewLifecycleOwner,
             { (activity as MainActivity).setupLoadingScreen(it) })
@@ -69,13 +74,13 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
         binding.ivFavourite.setImageResource(getFavouriteResourceForStatus(product.currentUserFavourite))
     }
 
-    private fun setupRecyclerView(product: ProductDTO) {
+    private fun setupRecyclerView() {
         binding.rvOrganizations.layoutManager = LinearLayoutManager(
             context,
             LinearLayoutManager.VERTICAL,
             false
         )
-        binding.rvOrganizations.adapter = OrganizationAdapter(product.organizations, this)
+        binding.rvOrganizations.adapter = OrganizationAdapter(catalogueViewModel.currentProductOrganizations.value ?: mutableListOf(), this)
     }
 
     override fun onOrganizationClicked(organization: OrganizationDTO) {

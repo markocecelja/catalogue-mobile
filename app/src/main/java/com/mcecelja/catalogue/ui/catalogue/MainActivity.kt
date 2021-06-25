@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainBinding: ActivityMainBinding
 
-    val catalogueViewModel by viewModel<CatalogueViewModel>()
+    private val catalogueViewModel by viewModel<CatalogueViewModel>()
 
     private val loadingViewModel by viewModel<LoadingViewModel>()
 
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             this,
             loadingViewModel
         )
-        catalogueViewModel.setOrganizations()
+        catalogueViewModel.setUserRatedOrganizations()
         catalogueViewModel.setUser()
 
         loadingViewModel.loadingVisibility.observe(

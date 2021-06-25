@@ -86,11 +86,12 @@ class ProductFragment : Fragment(), ProductItemClickListener {
         )
     }
 
-    override fun onProductClicked(position: Int) {
+    override fun onProductClicked(product: ProductDTO) {
+        catalogueViewModel.setOrganizationsByProductId(product.id, loadingViewModel)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationsListFragment.create(catalogueViewModel.products.value!![position]),
+                OrganizationsListFragment.create(product),
                 OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)
