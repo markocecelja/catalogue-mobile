@@ -8,5 +8,6 @@ enum class ErrorEnum(val message: String) {
     PASSWORD_MISMATCH("Lozinke se ne podudaraju!"),
     INVALID_EMAIL_ADDRESS("E-mail adresa nije dobro formatirana!"),
     NON_EXISTING_PRODUCT("Odabrani proizvod ne postoji!"),
-    NON_EXISTING_ORGANIZATION("Organizacija ne postoji!")
+    NON_EXISTING_ORGANIZATION("Organizacija ne postoji!"),
+    USERNAME_ALREADY_IN_USE("Korisničko ime se već koristi!")
 }
