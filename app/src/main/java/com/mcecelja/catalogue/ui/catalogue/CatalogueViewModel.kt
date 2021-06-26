@@ -1,43 +1,38 @@
 package com.mcecelja.catalogue.ui.catalogue
 
+import android.app.Activity
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.mcecelja.catalogue.Catalogue
-import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.data.dto.organization.RatingDTO
-import com.mcecelja.catalogue.data.dto.places.CoordinatesDTO
-import com.mcecelja.catalogue.data.dto.places.PlaceDTO
-import com.mcecelja.catalogue.data.dto.places.PlacesResponseDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.enums.PreferenceEnum
-import com.mcecelja.catalogue.model.LocationModel
 import com.mcecelja.catalogue.services.OrganizationService
-import com.mcecelja.catalogue.services.PlacesService
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.services.UserService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.utils.AlertUtil
-import com.mcecelja.catalogue.utils.PlacesUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class CatalogueViewModel : ViewModel() {
+class CatalogueViewModel : LoadingViewModel() {
 
     private val _products: MutableLiveData<List<ProductDTO>> = MutableLiveData<List<ProductDTO>>()
     val products: LiveData<List<ProductDTO>> = _products
 
     private val _user: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
     val user: LiveData<UserDTO> = _user
+
+    private val _currentProduct: MutableLiveData<ProductDTO> = MutableLiveData<ProductDTO>()
+    val currentProduct: LiveData<ProductDTO> = _currentProduct
 
     private val _currentProductOrganizations: MutableLiveData<List<OrganizationDTO>> =
         MutableLiveData<List<OrganizationDTO>>()
@@ -47,20 +42,15 @@ class CatalogueViewModel : ViewModel() {
         MutableLiveData<List<OrganizationDTO>>()
     val userRatedOrganizations: LiveData<List<OrganizationDTO>> = _userRatedOrganizations
 
-    private val _places: MutableLiveData<List<PlaceDTO>> = MutableLiveData<List<PlaceDTO>>()
-    val places: LiveData<List<PlaceDTO>> = _places
-
-    fun setProducts(
-        token: String,
-        name: String?,
-        activity: FragmentActivity,
-        loadingViewModel: LoadingViewModel
-    ) {
+    fun setProducts(activity: Activity, name: String?) {
 
         val apiCall =
-            RestUtil.createService(ProductService::class.java, token).getProducts(name)
+            RestUtil.createService(
+                ProductService::class.java,
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
+            ).getProducts(name)
 
-        loadingViewModel.changeVisibility(View.VISIBLE)
+        changeVisibility(View.VISIBLE)
 
         apiCall.enqueue(object : Callback<ResponseMessage<List<ProductDTO>>> {
             override fun onResponse(
@@ -68,7 +58,7 @@ class CatalogueViewModel : ViewModel() {
                 response: Response<ResponseMessage<List<ProductDTO>>>
             ) {
 
-                loadingViewModel.changeVisibility(View.INVISIBLE)
+                changeVisibility(View.INVISIBLE)
 
                 if (response.isSuccessful) {
 
@@ -88,7 +78,7 @@ class CatalogueViewModel : ViewModel() {
                 t: Throwable
             ) {
 
-                loadingViewModel.changeVisibility(View.INVISIBLE)
+                changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,
@@ -100,21 +90,25 @@ class CatalogueViewModel : ViewModel() {
         })
     }
 
-    fun setOrganizationsByProductId(productId: Long, loadingViewModel: LoadingViewModel) {
+    fun setCurrentProduct(product: ProductDTO) {
+        _currentProduct.value = product
+    }
+
+    fun setOrganizationsByProductId(productId: Long) {
         val apiCall =
             RestUtil.createService(
                 OrganizationService::class.java,
                 PreferenceManager.getPreference(PreferenceEnum.TOKEN)
             ).getOrganizations(productId)
 
-        loadingViewModel.changeVisibility(View.VISIBLE)
+        changeVisibility(View.VISIBLE)
 
         apiCall.enqueue(object : Callback<ResponseMessage<List<OrganizationDTO>>> {
             override fun onResponse(
                 call: Call<ResponseMessage<List<OrganizationDTO>>>,
                 response: Response<ResponseMessage<List<OrganizationDTO>>>
             ) {
-                loadingViewModel.changeVisibility(View.INVISIBLE)
+                changeVisibility(View.INVISIBLE)
 
                 if (response.isSuccessful) {
                     _currentProductOrganizations.value = response.body()?.payload
@@ -125,7 +119,7 @@ class CatalogueViewModel : ViewModel() {
                 call: Call<ResponseMessage<List<OrganizationDTO>>>,
                 t: Throwable
             ) {
-                loadingViewModel.changeVisibility(View.INVISIBLE)
+                changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,
@@ -138,17 +132,22 @@ class CatalogueViewModel : ViewModel() {
     }
 
     fun setUserRatedOrganizations() {
+
         val apiCall =
             RestUtil.createService(
                 OrganizationService::class.java,
                 PreferenceManager.getPreference(PreferenceEnum.TOKEN)
             ).getCurrentUserRatedOrganizations()
 
+        changeVisibility(View.VISIBLE)
+
         apiCall.enqueue(object : Callback<ResponseMessage<List<OrganizationDTO>>> {
             override fun onResponse(
                 call: Call<ResponseMessage<List<OrganizationDTO>>>,
                 response: Response<ResponseMessage<List<OrganizationDTO>>>
             ) {
+                changeVisibility(View.INVISIBLE)
+
                 if (response.isSuccessful) {
                     _userRatedOrganizations.value = response.body()?.payload
                 }
@@ -158,6 +157,8 @@ class CatalogueViewModel : ViewModel() {
                 call: Call<ResponseMessage<List<OrganizationDTO>>>,
                 t: Throwable
             ) {
+                changeVisibility(View.INVISIBLE)
+
                 Toast.makeText(
                     Catalogue.application,
                     "Get favourites failed!",
@@ -169,23 +170,30 @@ class CatalogueViewModel : ViewModel() {
     }
 
     fun setUser() {
+
         val apiCall =
             RestUtil.createService(
                 UserService::class.java,
                 PreferenceManager.getPreference(PreferenceEnum.TOKEN)
             ).getCurrentUserInfo()
 
+        changeVisibility(View.VISIBLE)
+
         apiCall.enqueue(object : Callback<ResponseMessage<UserDTO>> {
             override fun onResponse(
                 call: Call<ResponseMessage<UserDTO>>,
                 response: Response<ResponseMessage<UserDTO>>
             ) {
+                changeVisibility(View.INVISIBLE)
+
                 if (response.isSuccessful) {
                     _user.value = response.body()?.payload
                 }
             }
 
             override fun onFailure(call: Call<ResponseMessage<UserDTO>>, t: Throwable) {
+                changeVisibility(View.INVISIBLE)
+
                 Toast.makeText(
                     Catalogue.application,
                     "Get current user info failed!",
@@ -196,11 +204,7 @@ class CatalogueViewModel : ViewModel() {
         })
     }
 
-    fun changeFavouriteStatusForProduct(
-        product: ProductDTO,
-        activity: FragmentActivity?,
-        loadingViewModel: LoadingViewModel
-    ) {
+    fun changeFavouriteStatusForProduct(activity: Activity, product: ProductDTO) {
         val products = mutableListOf<ProductDTO>()
         _products.value?.let { products.addAll(it) }
 
@@ -210,14 +214,14 @@ class CatalogueViewModel : ViewModel() {
                 PreferenceManager.getPreference(PreferenceEnum.TOKEN)
             ).changeFavouriteStatus(product.id)
 
-        loadingViewModel.changeVisibility(View.VISIBLE)
+        changeVisibility(View.VISIBLE)
 
         apiCall.enqueue(object : Callback<ResponseMessage<ProductDTO>> {
             override fun onResponse(
                 call: Call<ResponseMessage<ProductDTO>>,
                 response: Response<ResponseMessage<ProductDTO>>
             ) {
-                loadingViewModel.changeVisibility(View.INVISIBLE)
+                changeVisibility(View.INVISIBLE)
 
                 if (response.isSuccessful) {
 
@@ -228,16 +232,7 @@ class CatalogueViewModel : ViewModel() {
                         )
                     } else {
                         response.body()?.payload?.let {
-
-                            val iterator: MutableIterator<ProductDTO> = products.iterator()
-
-                            while (iterator.hasNext()) {
-                                val p = iterator.next()
-                                if (p.id == product.id) {
-                                    products[products.indexOf(p)] = it
-                                }
-                            }
-                            _products.value = products
+                            _currentProduct.value = it
                         }
                     }
                 }
@@ -248,7 +243,7 @@ class CatalogueViewModel : ViewModel() {
                 t: Throwable
             ) {
 
-                loadingViewModel.changeVisibility(View.INVISIBLE)
+                changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,
@@ -260,20 +255,24 @@ class CatalogueViewModel : ViewModel() {
         })
     }
 
-    fun leaveRecension(organization: OrganizationDTO, grade: Int, activity: FragmentActivity) {
+    fun rateOrganization(activity: Activity, organization: OrganizationDTO, grade: Int) {
 
         val apiCall =
             RestUtil.createService(
                 OrganizationService::class.java, PreferenceManager.getPreference(
                     PreferenceEnum.TOKEN
                 )
-            ).leaveRecension(organization.id, RatingDTO(grade))
+            ).rateOrganization(organization.id, RatingDTO(grade))
+
+        changeVisibility(View.VISIBLE)
 
         apiCall.enqueue(object : Callback<ResponseMessage<OrganizationDTO>> {
             override fun onResponse(
                 call: Call<ResponseMessage<OrganizationDTO>>,
                 response: Response<ResponseMessage<OrganizationDTO>>
             ) {
+                changeVisibility(View.INVISIBLE)
+
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
@@ -285,22 +284,7 @@ class CatalogueViewModel : ViewModel() {
                         response.body()?.payload?.let {
 
                             setUserRatedOrganizations()
-
-                            if (_currentProductOrganizations.value != null) {
-
-                                val organizations = mutableListOf<OrganizationDTO>()
-                                organizations.addAll(_currentProductOrganizations.value!!)
-
-                                val iterator = organizations.iterator()
-                                while (iterator.hasNext()) {
-                                    val o = iterator.next()
-                                    if (o.id == it.id) {
-                                        organizations[organizations.indexOf(o)] = it
-                                    }
-                                }
-
-                                _currentProductOrganizations.value = organizations
-                            }
+                            _currentProduct.value?.let { setOrganizationsByProductId(it.id) }
                         }
                     }
                 }
@@ -310,6 +294,7 @@ class CatalogueViewModel : ViewModel() {
                 call: Call<ResponseMessage<OrganizationDTO>>,
                 t: Throwable
             ) {
+                changeVisibility(View.INVISIBLE)
 
                 Toast.makeText(
                     Catalogue.application,
@@ -319,64 +304,5 @@ class CatalogueViewModel : ViewModel() {
                     .show()
             }
         })
-    }
-
-    fun setCurrentOrganizationPlaces(
-        organization: OrganizationDTO,
-        locationModel: LocationModel,
-        apiKey: String
-    ) {
-        val apiCall =
-            PlacesUtil.createService(PlacesService::class.java).getNearbyPlaces(
-                CoordinatesDTO(locationModel.latitude, locationModel.longitude),
-                5000,
-                Catalogue.application.getString(R.string.places_type_filter),
-                organization.name,
-                apiKey
-            )
-
-        apiCall.enqueue(object : Callback<PlacesResponseDTO> {
-            override fun onResponse(
-                call: Call<PlacesResponseDTO>,
-                response: Response<PlacesResponseDTO>
-            ) {
-                if (response.isSuccessful) {
-
-                    val responsePlaces = response.body()!!.results.toMutableList()
-
-                    val iterator: MutableIterator<PlaceDTO> = responsePlaces.iterator()
-                    while (iterator.hasNext()) {
-                        val responsePlace = iterator.next()
-                        if (!responsePlace.name.contains(organization.name, true)) {
-                            iterator.remove()
-                        }
-                    }
-
-                    _places.value = responsePlaces
-                }
-            }
-
-            override fun onFailure(
-                call: Call<PlacesResponseDTO>,
-                t: Throwable
-            ) {
-
-                Toast.makeText(
-                    Catalogue.application,
-                    "Get places failed!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        })
-    }
-
-    fun getProductById(id: Long): ProductDTO? {
-        for (product in _products.value!!) {
-            if (product.id == id) {
-                return product
-            }
-        }
-
-        return null
     }
 }

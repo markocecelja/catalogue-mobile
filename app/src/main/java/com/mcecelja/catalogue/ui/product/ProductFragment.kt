@@ -11,23 +11,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.adapters.product.ProductAdapter
-import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.databinding.FragmentProductsBinding
-import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.ProductItemClickListener
-import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
 import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
-import com.mcecelja.catalogue.ui.catalogue.MainActivity
+import com.mcecelja.catalogue.ui.catalogue.CatalogueActivity
 
 class ProductFragment : Fragment(), ProductItemClickListener {
 
     private lateinit var productFragmentBinding: FragmentProductsBinding
 
     private lateinit var catalogueViewModel: CatalogueViewModel
-
-    private lateinit var loadingViewModel: LoadingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,32 +35,27 @@ class ProductFragment : Fragment(), ProductItemClickListener {
             catalogueViewModel = it
         }
 
-        ViewModelProvider(requireActivity()).get(LoadingViewModel::class.java).also {
-            loadingViewModel = it
-        }
-
         setupRecyclerView()
 
         catalogueViewModel.products.observe(
             viewLifecycleOwner,
             { (productFragmentBinding.rvProducts.adapter as ProductAdapter).refreshData(it) })
 
+        catalogueViewModel.currentProduct.observe(
+            viewLifecycleOwner,
+            { catalogueViewModel.setProducts(requireActivity(), null) })
+
         productFragmentBinding.etSearch.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                catalogueViewModel.setProducts(
-                    PreferenceManager.getPreference(PreferenceEnum.TOKEN),
-                    productFragmentBinding.etSearch.text.toString(),
-                    requireActivity(),
-                    loadingViewModel
-                )
+                catalogueViewModel.setProducts(requireActivity(), productFragmentBinding.etSearch.text.toString())
                 return@OnEditorActionListener true
             }
             false
         })
 
-        loadingViewModel.loadingVisibility.observe(
+        catalogueViewModel.loadingVisibility.observe(
             viewLifecycleOwner,
-            { (activity as MainActivity).setupLoadingScreen(it) })
+            { (activity as CatalogueActivity).setupLoadingScreen(it) })
 
         return productFragmentBinding.root
     }
@@ -81,19 +71,16 @@ class ProductFragment : Fragment(), ProductItemClickListener {
     }
 
     override fun onFavouriteClicked(product: ProductDTO) {
-        catalogueViewModel.changeFavouriteStatusForProduct(
-            product,
-            activity,
-            loadingViewModel
-        )
+        catalogueViewModel.changeFavouriteStatusForProduct(requireActivity(), product)
     }
 
     override fun onProductClicked(product: ProductDTO) {
-        catalogueViewModel.setOrganizationsByProductId(product.id, loadingViewModel)
+        catalogueViewModel.setCurrentProduct(product)
+        catalogueViewModel.setOrganizationsByProductId(product.id)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationsListFragment.create(product),
+                OrganizationsListFragment.create(),
                 OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)

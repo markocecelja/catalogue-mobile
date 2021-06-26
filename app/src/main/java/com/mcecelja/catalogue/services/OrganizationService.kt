@@ -9,7 +9,7 @@ import retrofit2.http.*
 interface OrganizationService {
 
     @PUT("organizations/{id}/recension")
-    fun leaveRecension(
+    fun rateOrganization(
         @Path("id") id: Long,
         @Body rating: RatingDTO
     ): Call<ResponseMessage<OrganizationDTO>>

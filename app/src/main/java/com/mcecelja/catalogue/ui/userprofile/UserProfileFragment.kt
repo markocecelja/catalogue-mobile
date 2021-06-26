@@ -31,8 +31,6 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
 
     private lateinit var catalogueViewModel: CatalogueViewModel
 
-    private lateinit var loadingViewModel: LoadingViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,10 +40,6 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
 
         ViewModelProvider(requireActivity()).get(CatalogueViewModel::class.java).also {
             catalogueViewModel = it
-        }
-
-        ViewModelProvider(requireActivity()).get(LoadingViewModel::class.java).also {
-            loadingViewModel = it
         }
 
         setupRecyclers()
@@ -110,13 +104,12 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
     }
 
     override fun onItemClicked(product: ProductDTO) {
-        catalogueViewModel.setOrganizationsByProductId(product.id, loadingViewModel)
+        catalogueViewModel.setCurrentProduct(product)
+        catalogueViewModel.setOrganizationsByProductId(product.id)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
-                OrganizationsListFragment.create(
-                    product
-                ),
+                OrganizationsListFragment.create(),
                 OrganizationsListFragment.TAG
             )
             .addToBackStack(TAG)

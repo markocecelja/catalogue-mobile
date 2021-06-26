@@ -58,14 +58,10 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
 
         setOrganization(organization)
         binding.rb.setOnRatingBarChangeListener { _, rating, _ ->
-            catalogueViewModel.leaveRecension(
-                organization,
-                rating.toInt(),
-                requireActivity()
-            )
+            catalogueViewModel.rateOrganization(requireActivity(), organization, rating.toInt())
         }
 
-        catalogueViewModel.places.observe(viewLifecycleOwner, { updateMapPlaces(it) })
+        mapsViewModel.places.observe(viewLifecycleOwner, { updateMapPlaces(it) })
 
         GpsUtils(requireActivity()).turnGPSOn(object : OnGpsListener {
 
@@ -120,8 +116,13 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateMap(locationModel: LocationModel) {
         val currentLocation = LatLng(locationModel.latitude, locationModel.longitude)
-        mapsViewModel.mMap.value!!.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 14f))
-        catalogueViewModel.setCurrentOrganizationPlaces(
+        mapsViewModel.mMap.value!!.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                currentLocation,
+                14f
+            )
+        )
+        mapsViewModel.setCurrentOrganizationPlaces(
             organization,
             locationModel,
             getString(R.string.places_api_key)
@@ -129,7 +130,7 @@ class OrganizationDetailsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateMapPlaces(places: List<PlaceDTO>) {
-        if(mapsViewModel.mMap.value != null) {
+        if (mapsViewModel.mMap.value != null) {
             for (place in places) {
 
                 mapsViewModel.mMap.value!!.addMarker(

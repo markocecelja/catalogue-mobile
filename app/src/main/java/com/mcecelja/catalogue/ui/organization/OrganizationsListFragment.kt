@@ -13,9 +13,8 @@ import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.databinding.FragmentOrganizationsListBinding
 import com.mcecelja.catalogue.listener.OrganizationItemClickListener
-import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
-import com.mcecelja.catalogue.ui.catalogue.MainActivity
+import com.mcecelja.catalogue.ui.catalogue.CatalogueActivity
 import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
 import com.mcecelja.catalogue.utils.getFavouriteResourceForStatus
 
@@ -24,8 +23,6 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
     private lateinit var binding: FragmentOrganizationsListBinding
 
     private lateinit var catalogueViewModel: CatalogueViewModel
-
-    private lateinit var loadingViewModel: LoadingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,36 +35,23 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
             catalogueViewModel = it
         }
 
-        ViewModelProvider(requireActivity()).get(LoadingViewModel::class.java).also {
-            loadingViewModel = it
-        }
-
         setupRecyclerView()
 
-        arguments?.let {
-            val product = it.getSerializable(PRODUCT) as ProductDTO
-            setupProduct(product)
+        catalogueViewModel.currentProduct.observe(
+            viewLifecycleOwner,
+            { setupProduct(it) })
 
-            binding.ivFavourite.setOnClickListener {
-                catalogueViewModel.changeFavouriteStatusForProduct(
-                    product,
-                    activity,
-                    loadingViewModel
-                )
-            }
-
-            catalogueViewModel.products.observe(
-                viewLifecycleOwner,
-                { setupProduct(catalogueViewModel.getProductById(product.id)!!) })
+        binding.ivFavourite.setOnClickListener {
+            catalogueViewModel.changeFavouriteStatusForProduct(requireActivity(), catalogueViewModel.currentProduct.value!!)
         }
 
         catalogueViewModel.currentProductOrganizations.observe(
             viewLifecycleOwner,
-            {  (binding.rvOrganizations.adapter as OrganizationAdapter).refreshData(it) })
+            { (binding.rvOrganizations.adapter as OrganizationAdapter).refreshData(it) })
 
-        loadingViewModel.loadingVisibility.observe(
+        catalogueViewModel.loadingVisibility.observe(
             viewLifecycleOwner,
-            { (activity as MainActivity).setupLoadingScreen(it) })
+            { (activity as CatalogueActivity).setupLoadingScreen(it) })
 
         return binding.root
     }
@@ -83,7 +67,9 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
             LinearLayoutManager.VERTICAL,
             false
         )
-        binding.rvOrganizations.adapter = OrganizationAdapter(catalogueViewModel.currentProductOrganizations.value ?: mutableListOf(), this)
+        binding.rvOrganizations.adapter = OrganizationAdapter(
+            catalogueViewModel.currentProductOrganizations.value ?: mutableListOf(), this
+        )
     }
 
     override fun onOrganizationClicked(organization: OrganizationDTO) {
@@ -99,13 +85,8 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
     companion object {
         const val TAG = "Organizations list"
-        private const val PRODUCT = "Product"
-        fun create(product: ProductDTO): OrganizationsListFragment {
-            val args = Bundle()
-            args.putSerializable(PRODUCT, product)
-            val fragment = OrganizationsListFragment()
-            fragment.arguments = args
-            return fragment
+        fun create(): OrganizationsListFragment {
+            return OrganizationsListFragment()
         }
     }
 }
