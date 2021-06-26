@@ -20,8 +20,6 @@ import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
 import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
 import com.mcecelja.catalogue.ui.catalogue.MainActivity
-import org.koin.androidx.viewmodel.ext.android.viewModel
-
 
 class ProductFragment : Fragment(), ProductItemClickListener {
 
@@ -29,7 +27,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
     private lateinit var catalogueViewModel: CatalogueViewModel
 
-    private val loadingViewModel by viewModel<LoadingViewModel>()
+    private lateinit var loadingViewModel: LoadingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +38,10 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
         ViewModelProvider(requireActivity()).get(CatalogueViewModel::class.java).also {
             catalogueViewModel = it
+        }
+
+        ViewModelProvider(requireActivity()).get(LoadingViewModel::class.java).also {
+            loadingViewModel = it
         }
 
         setupRecyclerView()

@@ -18,6 +18,7 @@ import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.FavouriteItemClickListener
 import com.mcecelja.catalogue.listener.OrganizationItemClickListener
+import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
@@ -30,6 +31,8 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
 
     private lateinit var catalogueViewModel: CatalogueViewModel
 
+    private lateinit var loadingViewModel: LoadingViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,6 +42,10 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
 
         ViewModelProvider(requireActivity()).get(CatalogueViewModel::class.java).also {
             catalogueViewModel = it
+        }
+
+        ViewModelProvider(requireActivity()).get(LoadingViewModel::class.java).also {
+            loadingViewModel = it
         }
 
         setupRecyclers()
@@ -103,6 +110,7 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
     }
 
     override fun onItemClicked(product: ProductDTO) {
+        catalogueViewModel.setOrganizationsByProductId(product.id, loadingViewModel)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,

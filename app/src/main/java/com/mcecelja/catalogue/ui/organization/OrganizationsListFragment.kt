@@ -18,7 +18,6 @@ import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
 import com.mcecelja.catalogue.ui.catalogue.MainActivity
 import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
 import com.mcecelja.catalogue.utils.getFavouriteResourceForStatus
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
@@ -26,7 +25,7 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
     private lateinit var catalogueViewModel: CatalogueViewModel
 
-    private val loadingViewModel by viewModel<LoadingViewModel>()
+    private lateinit var loadingViewModel: LoadingViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +36,10 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
         ViewModelProvider(requireActivity()).get(CatalogueViewModel::class.java).also {
             catalogueViewModel = it
+        }
+
+        ViewModelProvider(requireActivity()).get(LoadingViewModel::class.java).also {
+            loadingViewModel = it
         }
 
         setupRecyclerView()
