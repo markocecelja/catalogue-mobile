@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.catalogue.MainActivity">
+    tools:context=".ui.catalogue.CatalogueActivity">
 
     <FrameLayout
         android:id="@+id/fl_fragmentContainer"
@@ -23,7 +23,8 @@
             android:id="@+id/pb_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"
+            android:theme="@style/ProgressBar"/>
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,38 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.adapters.organization.OrganizationAdapter
-import com.mcecelja.catalogue.data.PreferenceManager
-import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
 import com.mcecelja.catalogue.databinding.FragmentOrganizationsListBinding
-import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.OrganizationItemClickListener
-import com.mcecelja.catalogue.services.ProductService
-import com.mcecelja.catalogue.ui.LoadingViewModel
-import com.mcecelja.catalogue.ui.catalogue.MainActivity
+import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
+import com.mcecelja.catalogue.ui.catalogue.CatalogueActivity
 import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
-import com.mcecelja.catalogue.utils.AlertUtil
-import com.mcecelja.catalogue.utils.RestUtil
 import com.mcecelja.catalogue.utils.getFavouriteResourceForStatus
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
     private lateinit var binding: FragmentOrganizationsListBinding
 
-    private val organizationViewModel by viewModel<OrganizationViewModel>()
-
-    private val loadingViewModel by viewModel<LoadingViewModel>()
+    private lateinit var catalogueViewModel: CatalogueViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,21 +31,27 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
     ): View {
         binding = FragmentOrganizationsListBinding.inflate(inflater, container, false)
 
-        arguments?.let {
-            val product = it.getSerializable(PRODUCT) as ProductDTO
-            setupRecyclerView(product)
-            organizationViewModel.setProduct(product)
+        ViewModelProvider(requireActivity()).get(CatalogueViewModel::class.java).also {
+            catalogueViewModel = it
         }
 
-        binding.ivFavourite.setOnClickListener { changeFavouriteStatus(organizationViewModel.product.value!!) }
+        setupRecyclerView()
 
-        loadingViewModel.loadingVisibility.observe(
-            viewLifecycleOwner,
-            { (activity as MainActivity).setupLoadingScreen(it) })
-
-        organizationViewModel.product.observe(
+        catalogueViewModel.currentProduct.observe(
             viewLifecycleOwner,
             { setupProduct(it) })
+
+        binding.ivFavourite.setOnClickListener {
+            catalogueViewModel.changeFavouriteStatusForProduct(requireActivity(), catalogueViewModel.currentProduct.value!!)
+        }
+
+        catalogueViewModel.currentProductOrganizations.observe(
+            viewLifecycleOwner,
+            { (binding.rvOrganizations.adapter as OrganizationAdapter).refreshData(it) })
+
+        catalogueViewModel.loadingVisibility.observe(
+            viewLifecycleOwner,
+            { (activity as CatalogueActivity).setupLoadingScreen(it) })
 
         return binding.root
     }
@@ -68,63 +61,15 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
         binding.ivFavourite.setImageResource(getFavouriteResourceForStatus(product.currentUserFavourite))
     }
 
-    private fun setupRecyclerView(product: ProductDTO) {
+    private fun setupRecyclerView() {
         binding.rvOrganizations.layoutManager = LinearLayoutManager(
             context,
             LinearLayoutManager.VERTICAL,
             false
         )
-        binding.rvOrganizations.adapter = OrganizationAdapter(product.organizations, this)
-    }
-
-    private fun changeFavouriteStatus(product: ProductDTO) {
-        val apiCall =
-            RestUtil.createService(
-                ProductService::class.java, PreferenceManager.getPreference(
-                    PreferenceEnum.TOKEN
-                )
-            ).changeFavouriteStatus(product.id)
-
-        loadingViewModel.changeVisibility(View.VISIBLE)
-
-        apiCall.enqueue(object : Callback<ResponseMessage<ProductDTO>> {
-            override fun onResponse(
-                call: Call<ResponseMessage<ProductDTO>>,
-                response: Response<ResponseMessage<ProductDTO>>
-            ) {
-                loadingViewModel.changeVisibility(View.INVISIBLE)
-
-                if (response.isSuccessful) {
-
-                    if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
-                            response.body()!!.errorCode,
-                            activity
-                        )
-                    } else {
-                        response.body()?.payload?.let {
-                            organizationViewModel.setProduct(it)
-                            (requireActivity() as MainActivity).productViewModel.updateProduct(it)
-                        }
-                    }
-                }
-            }
-
-            override fun onFailure(
-                call: Call<ResponseMessage<ProductDTO>>,
-                t: Throwable
-            ) {
-
-                loadingViewModel.changeVisibility(View.INVISIBLE)
-
-                Toast.makeText(
-                    Catalogue.application,
-                    "Change favourite status failed!",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
-            }
-        })
+        binding.rvOrganizations.adapter = OrganizationAdapter(
+            catalogueViewModel.currentProductOrganizations.value ?: mutableListOf(), this
+        )
     }
 
     override fun onOrganizationClicked(organization: OrganizationDTO) {
@@ -140,13 +85,8 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
     companion object {
         const val TAG = "Organizations list"
-        private const val PRODUCT = "Product"
-        fun create(product: ProductDTO): OrganizationsListFragment {
-            val args = Bundle()
-            args.putSerializable(PRODUCT, product)
-            val fragment = OrganizationsListFragment()
-            fragment.arguments = args
-            return fragment
+        fun create(): OrganizationsListFragment {
+            return OrganizationsListFragment()
         }
     }
 }

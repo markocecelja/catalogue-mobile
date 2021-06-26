@@ -18,7 +18,7 @@ class OrganizationAdapter(
         refreshData(organizations)
     }
 
-    private fun refreshData(organizations: List<OrganizationDTO>) {
+    fun refreshData(organizations: List<OrganizationDTO>) {
         this.organizations.clear()
         this.organizations.addAll(organizations)
         this.notifyDataSetChanged()

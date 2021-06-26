@@ -1,15 +1,15 @@
 package com.mcecelja.catalogue.utils
 
+import android.app.Activity
 import android.app.AlertDialog
-import androidx.fragment.app.FragmentActivity
 import com.mcecelja.catalogue.enums.ErrorEnum
 
 class AlertUtil {
 
     companion object {
-        fun showAlertMessageForErrorCode(errorCode: String, activity: FragmentActivity?) {
+        fun showAlertMessageForErrorCode(errorCode: String, activity: Activity) {
             val message = ErrorEnum.valueOf(errorCode).message
-            val alertDialog: AlertDialog? = activity?.let {
+            val alertDialog: AlertDialog = activity.let {
                 val builder = AlertDialog.Builder(it)
                 builder.apply {
                     setPositiveButton("OK"
@@ -19,7 +19,7 @@ class AlertUtil {
                 builder.setMessage(message).create()
             }
 
-            alertDialog?.show()
+            alertDialog.show()
         }
     }
 }

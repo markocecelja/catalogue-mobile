@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.R
 import com.mcecelja.catalogue.data.dto.ResponseMessage
@@ -22,6 +23,8 @@ class RegisterFragment : Fragment() {
 
     private lateinit var binding: FragmentRegisterBinding
 
+    private lateinit var loadingViewModel: LoginViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,6 +32,10 @@ class RegisterFragment : Fragment() {
     ): View {
 
         binding = FragmentRegisterBinding.inflate(inflater, container, false)
+
+        ViewModelProvider(requireActivity()).get(LoginViewModel::class.java).also {
+            loadingViewModel = it
+        }
 
         binding.mbRegister.setOnClickListener { registerUser() }
 
@@ -50,44 +57,7 @@ class RegisterFragment : Fragment() {
             binding.etEmail.text.toString(),
         )
 
-        val apiCall =
-            RestUtil.createService(AuthenticationService::class.java)
-                .registerUser(registerRequestDTO)
-
-        apiCall.enqueue(object : Callback<ResponseMessage<String>> {
-            override fun onResponse(
-                call: Call<ResponseMessage<String>>,
-                response: Response<ResponseMessage<String>>
-            ) {
-                if (response.isSuccessful) {
-
-                    if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
-                            response.body()!!.errorCode,
-                            activity
-                        )
-                    } else {
-                        requireActivity().supportFragmentManager.beginTransaction()
-                            .replace(
-                                R.id.fl_fragmentContainer,
-                                LoginFragment.create(),
-                                LoginFragment.TAG
-                            )
-                            .addToBackStack(TAG)
-                            .commit()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<ResponseMessage<String>>, t: Throwable) {
-                Toast.makeText(
-                    Catalogue.application,
-                    "User registration failed!",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
-            }
-        })
+        loadingViewModel.registerUser(requireActivity(), registerRequestDTO)
     }
 
     private fun validateInputFields(): Boolean {
