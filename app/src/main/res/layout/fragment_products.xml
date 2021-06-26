@@ -18,7 +18,8 @@
         app:boxCornerRadiusTopEnd="8dp"
         app:boxCornerRadiusBottomStart="8dp"
         app:boxCornerRadiusTopStart="8dp"
-        app:boxStrokeColor="@color/black">
+        app:boxStrokeColor="@color/black"
+        app:endIconMode="clear_text">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_search"

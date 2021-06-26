@@ -43,7 +43,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
 
         catalogueViewModel.currentProduct.observe(
             viewLifecycleOwner,
-            { catalogueViewModel.setProducts(requireActivity(), null) })
+            { catalogueViewModel.setProducts(requireActivity(), productFragmentBinding.etSearch.text.toString()) })
 
         productFragmentBinding.etSearch.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -52,6 +52,11 @@ class ProductFragment : Fragment(), ProductItemClickListener {
             }
             false
         })
+
+        productFragmentBinding.tilSearch.setEndIconOnClickListener {
+            productFragmentBinding.etSearch.text = null
+            catalogueViewModel.setProducts(requireActivity(), null)
+        }
 
         catalogueViewModel.loadingVisibility.observe(
             viewLifecycleOwner,

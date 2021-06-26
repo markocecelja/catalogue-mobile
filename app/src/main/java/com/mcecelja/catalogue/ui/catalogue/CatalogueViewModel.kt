@@ -205,9 +205,6 @@ class CatalogueViewModel : LoadingViewModel() {
     }
 
     fun changeFavouriteStatusForProduct(activity: Activity, product: ProductDTO) {
-        val products = mutableListOf<ProductDTO>()
-        _products.value?.let { products.addAll(it) }
-
         val apiCall =
             RestUtil.createService(
                 ProductService::class.java,
