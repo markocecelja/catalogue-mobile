@@ -1,30 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true">
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
-
     <TextView
         android:id="@+id/tv_userInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:textSize="@dimen/title_large"
-        app:drawableStartCompat="@drawable/account"
+        app:drawableStartCompat="@drawable/badge"
         android:drawablePadding="@dimen/padding_small"
-        tools:text="Ime Prezime"
+        android:text="@string/tv_userInfo_text"
         android:textColor="@color/black"
         android:layout_marginStart="@dimen/margin_small"
         android:layout_marginTop="@dimen/margin_large"/>
 
     <TextView
-        android:id="@+id/tv_favourites"
+        android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tv_userInfo"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="@dimen/text"
+        android:drawablePadding="@dimen/padding_small"
+        tools:text="Ime Prezime"
+        android:textColor="@color/black"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginStart="@dimen/margin_large"
+        app:drawableStartCompat="@drawable/account" />
+
+    <TextView
+        android:id="@+id/tv_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="@dimen/text"
+        app:drawableStartCompat="@drawable/email"
+        android:drawablePadding="@dimen/padding_small"
+        tools:text="mail@mail.com"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/margin_large"/>
+
+    <TextView
+        android:id="@+id/tv_favourites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_email"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/rv_favourites"
         android:textSize="@dimen/title_large"
@@ -43,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_favourites"
         android:layout_marginTop="@dimen/margin_medium"
         android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <TextView
         android:id="@+id/tv_recension"
@@ -68,7 +96,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_recension"
         android:layout_marginTop="@dimen/margin_medium"
         android:orientation="horizontal"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/mb_logout"
@@ -80,6 +108,7 @@
         android:text="@string/mb_logout_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_recension"
         app:layout_constraintEnd_toEndOf="parent"
         app:cornerRadius="8dp"
         app:strokeColor="@color/white"
@@ -89,3 +118,4 @@
         android:drawableStart="@drawable/logout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

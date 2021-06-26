@@ -14,6 +14,7 @@ import com.mcecelja.catalogue.adapters.recension.RecensionAdapter
 import com.mcecelja.catalogue.data.PreferenceManager
 import com.mcecelja.catalogue.data.dto.organization.OrganizationDTO
 import com.mcecelja.catalogue.data.dto.product.ProductDTO
+import com.mcecelja.catalogue.data.dto.users.UserDTO
 import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.FavouriteItemClickListener
@@ -48,15 +49,7 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
 
         catalogueViewModel.setUser()
 
-        catalogueViewModel.user.observe(
-            viewLifecycleOwner,
-            {
-                userProfileBinding.tvUserInfo.text = String.format(
-                    "%s %s",
-                    it.firstName,
-                    it.lastName
-                )
-            })
+        catalogueViewModel.user.observe(viewLifecycleOwner, { setupUser(it) })
 
         catalogueViewModel.products.observe(
             viewLifecycleOwner,
@@ -73,6 +66,17 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
             })
 
         return userProfileBinding.root
+    }
+
+    private fun setupUser(user: UserDTO) {
+
+        userProfileBinding.tvName.text = String.format(
+            "%s %s\n%s",
+            user.firstName,
+            user.lastName,
+            user.username
+        )
+        userProfileBinding.tvEmail.text = user.email
     }
 
     private fun setupRecyclers() {
@@ -138,5 +142,6 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
         PreferenceManager.removePreference(PreferenceEnum.TOKEN)
         val loginIntent = Intent(Catalogue.application, LoginActivity::class.java)
         startActivity(loginIntent)
+        requireActivity().finish()
     }
 }

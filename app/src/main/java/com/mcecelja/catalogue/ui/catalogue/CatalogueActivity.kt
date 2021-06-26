@@ -38,6 +38,7 @@ class CatalogueActivity : AppCompatActivity() {
         if (token.isEmpty()) {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
+            finish()
         } else {
             if (savedInstanceState == null) {
                 supportFragmentManager.beginTransaction()

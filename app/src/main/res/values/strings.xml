@@ -24,4 +24,5 @@
     <string name="tv_recension_text">Moje recenzije</string>
     <string name="mandatory_field">Ovo polje je obavezno!</string>
     <string name="places_type_filter">grocery</string>
+    <string name="tv_userInfo_text">Osnovne informacije</string>
 </resources>
