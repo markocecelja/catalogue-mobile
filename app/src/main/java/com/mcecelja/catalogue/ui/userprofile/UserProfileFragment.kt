@@ -19,7 +19,6 @@ import com.mcecelja.catalogue.databinding.FragmentUserProfileBinding
 import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.listener.FavouriteItemClickListener
 import com.mcecelja.catalogue.listener.OrganizationItemClickListener
-import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment

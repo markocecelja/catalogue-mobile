@@ -29,7 +29,7 @@ class FavouritesAdapter(products: List<ProductDTO>, private val favouriteItemCli
 
     override fun onBindViewHolder(holder: FavouritesViewHolder, position: Int) {
         val product = products[position]
-        holder.bind(product, favouriteItemClickListener, position)
+        holder.bind(product, favouriteItemClickListener)
 
     }
 

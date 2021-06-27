@@ -10,7 +10,7 @@ import com.mcecelja.catalogue.utils.getFavouriteResourceForStatus
 class ProductViewHolder(itemView: View) :
     RecyclerView.ViewHolder(itemView) {
 
-    fun bind(product: ProductDTO, productItemClickListener: ProductItemClickListener, position: Int) {
+    fun bind(product: ProductDTO, productItemClickListener: ProductItemClickListener) {
         val itemBinding = ItemProductBinding.bind(itemView)
         itemBinding.tvProductName.text = product.name
         itemBinding.ivFavourite.setImageResource(getFavouriteResourceForStatus(product.currentUserFavourite))

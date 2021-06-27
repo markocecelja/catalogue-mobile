@@ -11,8 +11,7 @@ class FavouritesViewHolder(itemView: View) :
 
     fun bind(
         product: ProductDTO,
-        favouriteItemClickListener: FavouriteItemClickListener,
-        position: Int
+        favouriteItemClickListener: FavouriteItemClickListener
     ) {
         val itemBinding = ItemFavouriteBinding.bind(itemView)
         itemBinding.tvProductName.text = product.name

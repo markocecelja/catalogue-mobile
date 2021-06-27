@@ -4,20 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.mcecelja.catalogue.Catalogue
 import com.mcecelja.catalogue.R
-import com.mcecelja.catalogue.data.dto.ResponseMessage
 import com.mcecelja.catalogue.data.dto.users.RegisterRequestDTO
 import com.mcecelja.catalogue.databinding.FragmentRegisterBinding
-import com.mcecelja.catalogue.services.AuthenticationService
-import com.mcecelja.catalogue.utils.AlertUtil
-import com.mcecelja.catalogue.utils.RestUtil
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class RegisterFragment : Fragment() {
 

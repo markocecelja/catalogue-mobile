@@ -29,7 +29,7 @@ class ProductAdapter(products: List<ProductDTO>, private val productItemClickLis
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = products[position]
-        holder.bind(product, productItemClickListener, position)
+        holder.bind(product, productItemClickListener)
 
     }
 
