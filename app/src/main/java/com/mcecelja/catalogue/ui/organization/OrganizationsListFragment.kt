@@ -37,15 +37,15 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
 
         setupRecyclerView()
 
-        catalogueViewModel.currentProduct.observe(
+        catalogueViewModel.selectedProduct.observe(
             viewLifecycleOwner,
             { setupProduct(it) })
 
         binding.ivFavourite.setOnClickListener {
-            catalogueViewModel.changeFavouriteStatusForProduct(requireActivity(), catalogueViewModel.currentProduct.value!!)
+            catalogueViewModel.changeFavouriteStatusForProduct(requireActivity(), catalogueViewModel.selectedProduct.value!!)
         }
 
-        catalogueViewModel.currentProductOrganizations.observe(
+        catalogueViewModel.selectedProductOrganizations.observe(
             viewLifecycleOwner,
             { (binding.rvOrganizations.adapter as OrganizationAdapter).refreshData(it) })
 
@@ -68,7 +68,7 @@ class OrganizationsListFragment : Fragment(), OrganizationItemClickListener {
             false
         )
         binding.rvOrganizations.adapter = OrganizationAdapter(
-            catalogueViewModel.currentProductOrganizations.value ?: mutableListOf(), this
+            catalogueViewModel.selectedProductOrganizations.value ?: mutableListOf(), this
         )
     }
 

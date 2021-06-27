@@ -25,18 +25,23 @@ import retrofit2.Response
 
 class CatalogueViewModel : LoadingViewModel() {
 
-    private val _products: MutableLiveData<List<ProductDTO>> = MutableLiveData<List<ProductDTO>>()
-    val products: LiveData<List<ProductDTO>> = _products
-
     private val _user: MutableLiveData<UserDTO> = MutableLiveData<UserDTO>()
     val user: LiveData<UserDTO> = _user
 
-    private val _currentProduct: MutableLiveData<ProductDTO> = MutableLiveData<ProductDTO>()
-    val currentProduct: LiveData<ProductDTO> = _currentProduct
+    private val _products: MutableLiveData<List<ProductDTO>> = MutableLiveData<List<ProductDTO>>()
+    val products: LiveData<List<ProductDTO>> = _products
 
-    private val _currentProductOrganizations: MutableLiveData<List<OrganizationDTO>> =
+    private val _currentUserFavourites: MutableLiveData<List<ProductDTO>> =
+        MutableLiveData<List<ProductDTO>>()
+    val currentUserFavourites: LiveData<List<ProductDTO>> = _currentUserFavourites
+
+    private val _selectedProduct: MutableLiveData<ProductDTO> = MutableLiveData<ProductDTO>()
+    val selectedProduct: LiveData<ProductDTO> = _selectedProduct
+
+    private val _selectedProductOrganizations: MutableLiveData<List<OrganizationDTO>> =
         MutableLiveData<List<OrganizationDTO>>()
-    val currentProductOrganizations: LiveData<List<OrganizationDTO>> = _currentProductOrganizations
+    val selectedProductOrganizations: LiveData<List<OrganizationDTO>> =
+        _selectedProductOrganizations
 
     private val _userRatedOrganizations: MutableLiveData<List<OrganizationDTO>> =
         MutableLiveData<List<OrganizationDTO>>()
@@ -90,11 +95,59 @@ class CatalogueViewModel : LoadingViewModel() {
         })
     }
 
-    fun setCurrentProduct(product: ProductDTO) {
-        _currentProduct.value = product
+    fun setCurrentUserFavourites(activity: Activity) {
+
+        val apiCall =
+            RestUtil.createService(
+                ProductService::class.java,
+                PreferenceManager.getPreference(PreferenceEnum.TOKEN)
+            ).getCurrentUserFavourites()
+
+        changeVisibility(View.VISIBLE)
+
+        apiCall.enqueue(object : Callback<ResponseMessage<List<ProductDTO>>> {
+            override fun onResponse(
+                call: Call<ResponseMessage<List<ProductDTO>>>,
+                response: Response<ResponseMessage<List<ProductDTO>>>
+            ) {
+
+                changeVisibility(View.INVISIBLE)
+
+                if (response.isSuccessful) {
+
+                    if (response.body()?.errorCode != null) {
+                        AlertUtil.showAlertMessageForErrorCode(
+                            response.body()!!.errorCode,
+                            activity
+                        )
+                    } else {
+                        _currentUserFavourites.value = response.body()?.payload
+                    }
+                }
+            }
+
+            override fun onFailure(
+                call: Call<ResponseMessage<List<ProductDTO>>>,
+                t: Throwable
+            ) {
+
+                changeVisibility(View.INVISIBLE)
+
+                Toast.makeText(
+                    Catalogue.application,
+                    "Get favourites failed!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+        })
     }
 
-    fun setOrganizationsByProductId(productId: Long) {
+    fun setSelectedProduct(product: ProductDTO) {
+        _selectedProduct.value = product
+    }
+
+    fun setOrganizationsByProductId(activity: Activity, productId: Long) {
         val apiCall =
             RestUtil.createService(
                 OrganizationService::class.java,
@@ -110,8 +163,13 @@ class CatalogueViewModel : LoadingViewModel() {
             ) {
                 changeVisibility(View.INVISIBLE)
 
-                if (response.isSuccessful) {
-                    _currentProductOrganizations.value = response.body()?.payload
+                if (response.body()?.errorCode != null) {
+                    AlertUtil.showAlertMessageForErrorCode(
+                        response.body()!!.errorCode,
+                        activity
+                    )
+                } else if (response.isSuccessful) {
+                    _selectedProductOrganizations.value = response.body()?.payload
                 }
             }
 
@@ -131,7 +189,7 @@ class CatalogueViewModel : LoadingViewModel() {
         })
     }
 
-    fun setUserRatedOrganizations() {
+    fun setUserRatedOrganizations(activity: Activity) {
 
         val apiCall =
             RestUtil.createService(
@@ -148,7 +206,12 @@ class CatalogueViewModel : LoadingViewModel() {
             ) {
                 changeVisibility(View.INVISIBLE)
 
-                if (response.isSuccessful) {
+                if (response.body()?.errorCode != null) {
+                    AlertUtil.showAlertMessageForErrorCode(
+                        response.body()!!.errorCode,
+                        activity
+                    )
+                } else if (response.isSuccessful) {
                     _userRatedOrganizations.value = response.body()?.payload
                 }
             }
@@ -169,7 +232,7 @@ class CatalogueViewModel : LoadingViewModel() {
         })
     }
 
-    fun setUser() {
+    fun setUser(activity: Activity) {
 
         val apiCall =
             RestUtil.createService(
@@ -186,7 +249,12 @@ class CatalogueViewModel : LoadingViewModel() {
             ) {
                 changeVisibility(View.INVISIBLE)
 
-                if (response.isSuccessful) {
+                if (response.body()?.errorCode != null) {
+                    AlertUtil.showAlertMessageForErrorCode(
+                        response.body()!!.errorCode,
+                        activity
+                    )
+                } else if (response.isSuccessful) {
                     _user.value = response.body()?.payload
                 }
             }
@@ -229,7 +297,7 @@ class CatalogueViewModel : LoadingViewModel() {
                         )
                     } else {
                         response.body()?.payload?.let {
-                            _currentProduct.value = it
+                            _selectedProduct.value = it
                         }
                     }
                 }
@@ -280,8 +348,13 @@ class CatalogueViewModel : LoadingViewModel() {
                     } else {
                         response.body()?.payload?.let {
 
-                            setUserRatedOrganizations()
-                            _currentProduct.value?.let { setOrganizationsByProductId(it.id) }
+                            setUserRatedOrganizations(activity)
+                            _selectedProduct.value?.let {
+                                setOrganizationsByProductId(
+                                    activity,
+                                    it.id
+                                )
+                            }
                         }
                     }
                 }

@@ -41,7 +41,7 @@ class ProductFragment : Fragment(), ProductItemClickListener {
             viewLifecycleOwner,
             { (productFragmentBinding.rvProducts.adapter as ProductAdapter).refreshData(it) })
 
-        catalogueViewModel.currentProduct.observe(
+        catalogueViewModel.selectedProduct.observe(
             viewLifecycleOwner,
             { catalogueViewModel.setProducts(requireActivity(), productFragmentBinding.etSearch.text.toString()) })
 
@@ -80,8 +80,8 @@ class ProductFragment : Fragment(), ProductItemClickListener {
     }
 
     override fun onProductClicked(product: ProductDTO) {
-        catalogueViewModel.setCurrentProduct(product)
-        catalogueViewModel.setOrganizationsByProductId(product.id)
+        catalogueViewModel.setSelectedProduct(product)
+        catalogueViewModel.setOrganizationsByProductId(requireActivity(), product.id)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,

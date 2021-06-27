@@ -26,8 +26,9 @@ class CatalogueActivity : AppCompatActivity() {
         setContentView(activityCatalogueBinding.root)
 
         catalogueViewModel.setProducts(this, null)
-        catalogueViewModel.setUserRatedOrganizations()
-        catalogueViewModel.setUser()
+        catalogueViewModel.setCurrentUserFavourites(this)
+        catalogueViewModel.setUserRatedOrganizations(this)
+        catalogueViewModel.setUser(this)
 
         catalogueViewModel.loadingVisibility.observe(
             this,

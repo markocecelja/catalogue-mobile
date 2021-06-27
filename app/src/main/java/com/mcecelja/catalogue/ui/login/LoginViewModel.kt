@@ -49,8 +49,8 @@ class LoginViewModel : LoadingViewModel() {
                             PreferenceEnum.TOKEN,
                             response.body()?.payload?.jwt
                         )
-                        val mainIntent = Intent(Catalogue.application, CatalogueActivity::class.java)
-                        activity.startActivity(mainIntent)
+                        val intent = Intent(Catalogue.application, CatalogueActivity::class.java)
+                        activity.startActivity(intent)
                     }
                 }
             }

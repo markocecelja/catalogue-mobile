@@ -23,7 +23,6 @@ import com.mcecelja.catalogue.ui.catalogue.CatalogueViewModel
 import com.mcecelja.catalogue.ui.login.LoginActivity
 import com.mcecelja.catalogue.ui.organization.OrganizationsListFragment
 import com.mcecelja.catalogue.ui.organization.details.OrganizationDetailsFragment
-import java.util.stream.Collectors
 
 class UserProfileFragment : Fragment(), FavouriteItemClickListener, OrganizationItemClickListener {
 
@@ -46,16 +45,14 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
 
         userProfileBinding.mbLogout.setOnClickListener { logout() }
 
-        catalogueViewModel.setUser()
+        catalogueViewModel.setUser(requireActivity())
 
         catalogueViewModel.user.observe(viewLifecycleOwner, { setupUser(it) })
 
-        catalogueViewModel.products.observe(
+        catalogueViewModel.currentUserFavourites.observe(
             viewLifecycleOwner,
             {
-                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(
-                    getUserFavouritesFromProduct(it)
-                )
+                (userProfileBinding.rvFavourites.adapter as FavouritesAdapter).refreshData(it)
             })
 
         catalogueViewModel.userRatedOrganizations.observe(
@@ -63,6 +60,10 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
             {
                 (userProfileBinding.rvRecension.adapter as RecensionAdapter).refreshData(it)
             })
+
+        catalogueViewModel.selectedProduct.observe(
+            viewLifecycleOwner,
+            { catalogueViewModel.setCurrentUserFavourites(requireActivity()) })
 
         return userProfileBinding.root
     }
@@ -81,7 +82,8 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
     private fun setupRecyclers() {
 
         userProfileBinding.rvFavourites.adapter = FavouritesAdapter(
-            getUserFavouritesFromProduct(catalogueViewModel.products.value ?: mutableListOf()), this
+            catalogueViewModel.currentUserFavourites.value ?: mutableListOf(),
+            this
         )
 
         userProfileBinding.rvRecension.adapter = RecensionAdapter(
@@ -90,25 +92,9 @@ class UserProfileFragment : Fragment(), FavouriteItemClickListener, Organization
         )
     }
 
-    private fun getUserFavouritesFromProduct(products: List<ProductDTO>): List<ProductDTO> {
-        var favourites: MutableList<ProductDTO> = mutableListOf()
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            favourites =
-                products.stream().filter { it.currentUserFavourite }.collect(Collectors.toList())
-        } else {
-            for (product in products) {
-                if (product.currentUserFavourite) {
-                    favourites.add(product)
-                }
-            }
-        }
-
-        return favourites
-    }
-
     override fun onItemClicked(product: ProductDTO) {
-        catalogueViewModel.setCurrentProduct(product)
-        catalogueViewModel.setOrganizationsByProductId(product.id)
+        catalogueViewModel.setSelectedProduct(product)
+        catalogueViewModel.setOrganizationsByProductId(requireActivity(), product.id)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fl_fragmentContainer,
