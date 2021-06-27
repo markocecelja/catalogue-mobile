@@ -41,5 +41,11 @@ class RestUtil {
             }
             return retrofit.create(serviceClass)
         }
+
+        fun clearHeader() {
+            httpClient.interceptors().clear()
+            builder.client(httpClient.build())
+            retrofit = builder.build()
+        }
     }
 }

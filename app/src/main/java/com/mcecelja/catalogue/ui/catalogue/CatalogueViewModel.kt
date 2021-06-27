@@ -17,7 +17,7 @@ import com.mcecelja.catalogue.services.OrganizationService
 import com.mcecelja.catalogue.services.ProductService
 import com.mcecelja.catalogue.services.UserService
 import com.mcecelja.catalogue.ui.LoadingViewModel
-import com.mcecelja.catalogue.utils.AlertUtil
+import com.mcecelja.catalogue.utils.ErrorUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import retrofit2.Call
 import retrofit2.Callback
@@ -68,10 +68,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
+                        ErrorUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
+
+                        ErrorUtil.handleError(response.body()!!.errorCode, activity)
                     } else {
                         _products.value = response.body()?.payload
                     }
@@ -116,10 +118,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
+                        ErrorUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
+
+                        ErrorUtil.handleError(response.body()!!.errorCode, activity)
                     } else {
                         _currentUserFavourites.value = response.body()?.payload
                     }
@@ -164,10 +168,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 changeVisibility(View.INVISIBLE)
 
                 if (response.body()?.errorCode != null) {
-                    AlertUtil.showAlertMessageForErrorCode(
+                    ErrorUtil.showAlertMessageForErrorCode(
                         response.body()!!.errorCode,
                         activity
                     )
+
+                    ErrorUtil.handleError(response.body()!!.errorCode, activity)
                 } else if (response.isSuccessful) {
                     _selectedProductOrganizations.value = response.body()?.payload
                 }
@@ -207,10 +213,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 changeVisibility(View.INVISIBLE)
 
                 if (response.body()?.errorCode != null) {
-                    AlertUtil.showAlertMessageForErrorCode(
+                    ErrorUtil.showAlertMessageForErrorCode(
                         response.body()!!.errorCode,
                         activity
                     )
+
+                    ErrorUtil.handleError(response.body()!!.errorCode, activity)
                 } else if (response.isSuccessful) {
                     _userRatedOrganizations.value = response.body()?.payload
                 }
@@ -250,10 +258,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 changeVisibility(View.INVISIBLE)
 
                 if (response.body()?.errorCode != null) {
-                    AlertUtil.showAlertMessageForErrorCode(
+                    ErrorUtil.showAlertMessageForErrorCode(
                         response.body()!!.errorCode,
                         activity
                     )
+
+                    ErrorUtil.handleError(response.body()!!.errorCode, activity)
                 } else if (response.isSuccessful) {
                     _user.value = response.body()?.payload
                 }
@@ -291,10 +301,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
+                        ErrorUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
+
+                        ErrorUtil.handleError(response.body()!!.errorCode, activity)
                     } else {
                         response.body()?.payload?.let {
                             _selectedProduct.value = it
@@ -341,10 +353,12 @@ class CatalogueViewModel : LoadingViewModel() {
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
+                        ErrorUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
+
+                        ErrorUtil.handleError(response.body()!!.errorCode, activity)
                     } else {
                         response.body()?.payload?.let {
 

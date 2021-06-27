@@ -14,7 +14,7 @@ import com.mcecelja.catalogue.enums.PreferenceEnum
 import com.mcecelja.catalogue.services.AuthenticationService
 import com.mcecelja.catalogue.ui.LoadingViewModel
 import com.mcecelja.catalogue.ui.catalogue.CatalogueActivity
-import com.mcecelja.catalogue.utils.AlertUtil
+import com.mcecelja.catalogue.utils.ErrorUtil
 import com.mcecelja.catalogue.utils.RestUtil
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,10 +40,12 @@ class LoginViewModel : LoadingViewModel() {
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
+                        ErrorUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
+
+                        ErrorUtil.handleError(response.body()!!.errorCode, activity)
                     } else {
                         PreferenceManager.savePreference(
                             PreferenceEnum.TOKEN,
@@ -85,10 +87,12 @@ class LoginViewModel : LoadingViewModel() {
                 if (response.isSuccessful) {
 
                     if (response.body()?.errorCode != null) {
-                        AlertUtil.showAlertMessageForErrorCode(
+                        ErrorUtil.showAlertMessageForErrorCode(
                             response.body()!!.errorCode,
                             activity
                         )
+
+                        ErrorUtil.handleError(response.body()!!.errorCode, activity)
                     } else {
                         loginUser(
                             activity,

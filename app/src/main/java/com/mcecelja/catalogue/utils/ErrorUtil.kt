@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import com.mcecelja.catalogue.enums.ErrorEnum
 
-class AlertUtil {
+class ErrorUtil {
 
     companion object {
         fun showAlertMessageForErrorCode(errorCode: String, activity: Activity) {
@@ -20,6 +20,14 @@ class AlertUtil {
             }
 
             alertDialog.show()
+        }
+
+        fun handleError(errorCode: String, activity: Activity) {
+            val error = ErrorEnum.valueOf(errorCode)
+
+            if(error.errorHandler != null) {
+                error.errorHandler.handleError(activity)
+            }
         }
     }
 }

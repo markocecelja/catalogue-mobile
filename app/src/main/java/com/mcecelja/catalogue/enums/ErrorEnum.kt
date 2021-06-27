@@ -1,13 +1,16 @@
 package com.mcecelja.catalogue.enums
 
-enum class ErrorEnum(val message: String) {
+import com.mcecelja.catalogue.utils.handlers.ErrorHandler
+import com.mcecelja.catalogue.utils.handlers.SessionExpiredErrorHandler
 
-    SESSION_EXPIRED("Potrebna ponovna prijava!"),
-    BAD_CREDENTIALS("Netočno korisničko ime ili lozinka!"),
-    BAD_REQUEST("Greška pri obradi podataka!"),
-    PASSWORD_MISMATCH("Lozinke se ne podudaraju!"),
-    INVALID_EMAIL_ADDRESS("E-mail adresa nije dobro formatirana!"),
-    NON_EXISTING_PRODUCT("Odabrani proizvod ne postoji!"),
-    NON_EXISTING_ORGANIZATION("Organizacija ne postoji!"),
-    USERNAME_ALREADY_IN_USE("Korisničko ime se već koristi!")
+enum class ErrorEnum(val message: String, val errorHandler: ErrorHandler?) {
+
+    SESSION_EXPIRED("Potrebna ponovna prijava!", SessionExpiredErrorHandler()),
+    BAD_CREDENTIALS("Netočno korisničko ime ili lozinka!", null),
+    BAD_REQUEST("Greška pri obradi podataka!", null),
+    PASSWORD_MISMATCH("Lozinke se ne podudaraju!", null),
+    INVALID_EMAIL_ADDRESS("E-mail adresa nije dobro formatirana!", null),
+    NON_EXISTING_PRODUCT("Odabrani proizvod ne postoji!", null),
+    NON_EXISTING_ORGANIZATION("Organizacija ne postoji!", null),
+    USERNAME_ALREADY_IN_USE("Korisničko ime se već koristi!", null)
 }
